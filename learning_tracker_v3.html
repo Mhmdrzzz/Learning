@@ -1,0 +1,468 @@
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --ink:#1a1a1a;--ink2:#6b6b6b;--ink3:#a8a8a8;
+  --surface:#ffffff;--surface2:#f7f6f3;--surface3:#efede8;
+  --accent:#c8a96e;--accent2:#e8d5b0;
+  --border:#e2dfd8;
+  --green:#2d6a4f;--green-bg:#d8f3dc;
+  --blue:#1a4e8c;--blue-bg:#dbeafe;
+  --amber:#92400e;--amber-bg:#fef3c7;
+  --purple:#5b21b6;--purple-bg:#ede9fe;
+  --rose:#9f1239;--rose-bg:#ffe4e6;
+  --radius:14px;--radius-sm:8px;
+}
+body{font-family:'DM Sans',sans-serif;background:var(--surface);color:var(--ink)}
+.wrap{max-width:680px;margin:0 auto;padding:1.5rem 1rem 3rem}
+
+.header-top{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:1.25rem}
+.header-title{font-family:'Instrument Serif',serif;font-size:26px;color:var(--ink);line-height:1.1}
+.header-title span{font-style:italic;color:var(--accent)}
+.header-date{font-size:11px;color:var(--ink3);letter-spacing:0.05em;text-transform:uppercase}
+
+.overall-stats{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:1.5rem}
+.ostat{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:10px 12px;position:relative;overflow:hidden}
+.ostat::before{content:'';position:absolute;top:0;left:0;right:0;height:3px}
+.ostat.s-books::before{background:var(--accent)}
+.ostat.s-articles::before{background:#7c9cba}
+.ostat.s-courses::before{background:var(--green)}
+.ostat.s-lang::before{background:var(--purple)}
+.ostat.s-content::before{background:var(--rose)}
+.ostat-num{font-family:'Instrument Serif',serif;font-size:26px;color:var(--ink);line-height:1}
+.ostat-label{font-size:10px;color:var(--ink3);margin-top:3px;text-transform:uppercase;letter-spacing:0.05em}
+
+.tabs-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;margin-bottom:1.25rem;padding-bottom:2px}
+.tabs-scroll::-webkit-scrollbar{display:none}
+.tabs{display:flex;gap:5px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:4px;min-width:max-content;width:100%}
+.tab{flex:1;padding:8px 10px;font-size:12px;font-weight:500;cursor:pointer;border:none;background:none;color:var(--ink2);border-radius:calc(var(--radius) - 4px);transition:all 0.15s;font-family:'DM Sans',sans-serif;white-space:nowrap;display:flex;align-items:center;justify-content:center;gap:5px}
+.tab .tc{font-size:10px;background:var(--surface3);color:var(--ink3);border-radius:20px;padding:1px 6px;transition:all 0.15s}
+.tab.active{background:var(--surface);color:var(--ink);box-shadow:0 1px 4px rgba(0,0,0,0.08)}
+.tab.active .tc{background:var(--accent2);color:var(--amber)}
+
+.section{display:none}.section.active{display:block}
+
+.add-btn{width:100%;padding:12px;border:1.5px dashed var(--border);border-radius:var(--radius);background:none;color:var(--ink3);font-size:13px;font-family:'DM Sans',sans-serif;cursor:pointer;transition:all 0.15s;margin-bottom:1rem;display:flex;align-items:center;justify-content:center;gap:7px}
+.add-btn:hover{border-color:var(--accent);color:var(--accent);background:rgba(200,169,110,0.04)}
+
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1.1rem 1.2rem;margin-bottom:9px;transition:box-shadow 0.15s}
+.card:hover{box-shadow:0 3px 14px rgba(0,0,0,0.06)}
+.card-top{display:flex;align-items:flex-start;gap:11px}
+.card-icon{width:38px;height:38px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}
+.ci-book{background:#fdf4e3}.ci-art{background:#e8f4fd}.ci-course{background:#e8f5ec}.ci-lang{background:#f3f0ff}.ci-content{background:#fff1f2}
+.card-body{flex:1;min-width:0}
+.card-title{font-size:14px;font-weight:500;color:var(--ink);margin-bottom:2px;line-height:1.3}
+.card-sub{font-size:12px;color:var(--ink3)}
+.card-badge{flex-shrink:0}
+
+.badge{display:inline-flex;align-items:center;font-size:11px;font-weight:500;padding:3px 9px;border-radius:20px}
+.b-reading{background:var(--blue-bg);color:var(--blue)}
+.b-done{background:var(--green-bg);color:var(--green)}
+.b-queued{background:var(--surface3);color:var(--ink3)}
+.b-progress{background:var(--amber-bg);color:var(--amber)}
+.b-active{background:var(--purple-bg);color:var(--purple)}
+.b-shared{background:var(--rose-bg);color:var(--rose)}
+
+.progress-wrap{margin-top:10px}
+.progress-header{display:flex;justify-content:space-between;margin-bottom:5px}
+.progress-pct{font-size:12px;font-weight:500;color:var(--ink)}
+.progress-track{height:5px;background:var(--surface3);border-radius:3px;overflow:hidden}
+.progress-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--accent),#e8b96e);transition:width 0.4s}
+
+.card-note{margin-top:9px;padding:9px 11px;background:var(--surface2);border-radius:var(--radius-sm);font-size:12px;color:var(--ink2);line-height:1.5;border-left:2px solid var(--accent2)}
+.card-footer{display:flex;align-items:center;justify-content:space-between;margin-top:10px;padding-top:10px;border-top:1px solid var(--border)}
+.card-meta-small{font-size:11px;color:var(--ink3)}
+.card-actions{display:flex;gap:5px}
+.act-btn{font-size:11px;padding:4px 10px;border:1px solid var(--border);border-radius:20px;cursor:pointer;background:none;color:var(--ink2);font-family:'DM Sans',sans-serif;transition:all 0.12s}
+.act-btn:hover{background:var(--surface2);color:var(--ink)}
+.act-btn.del:hover{border-color:#fca5a5;color:#dc2626;background:#fff5f5}
+.act-btn.link-btn{color:var(--blue)}
+
+.empty-state{text-align:center;padding:2.5rem 1rem;color:var(--ink3)}
+.empty-icon{font-size:32px;margin-bottom:10px;opacity:0.5}
+.empty-text{font-size:13px}
+
+/* Settings */
+.settings-section{margin-bottom:1.5rem}
+.settings-title{font-size:12px;font-weight:500;color:var(--ink3);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--border)}
+.settings-card{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:1rem 1.25rem;margin-bottom:8px}
+.settings-row{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.settings-label{font-size:14px;font-weight:500;color:var(--ink)}
+.settings-desc{font-size:12px;color:var(--ink3);margin-top:2px}
+.settings-btn{padding:8px 18px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:13px;font-family:'DM Sans',sans-serif;cursor:pointer;background:var(--surface);color:var(--ink);transition:all 0.12s;white-space:nowrap}
+.settings-btn:hover{background:var(--surface3)}
+.settings-btn.primary{background:var(--ink);color:white;border-color:var(--ink)}
+.settings-btn.primary:hover{opacity:0.85}
+.settings-btn.danger{color:#dc2626;border-color:#fca5a5}
+.settings-btn.danger:hover{background:#fff5f5}
+.stats-detail{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:1rem}
+.stat-item{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 14px;display:flex;justify-content:space-between;align-items:center}
+.stat-item-label{font-size:13px;color:var(--ink2)}
+.stat-item-val{font-size:15px;font-weight:500;color:var(--ink)}
+
+.file-input{display:none}
+.import-area{border:1.5px dashed var(--border);border-radius:var(--radius);padding:1.5rem;text-align:center;cursor:pointer;transition:all 0.15s;margin-top:8px}
+.import-area:hover{border-color:var(--accent);background:rgba(200,169,110,0.03)}
+.import-area-text{font-size:13px;color:var(--ink3)}
+
+/* Modal */
+.overlay{display:none;position:fixed;inset:0;background:rgba(26,26,26,0.45);z-index:200;align-items:flex-end;justify-content:center;backdrop-filter:blur(2px)}
+.overlay.open{display:flex}
+.modal{background:var(--surface);border-radius:var(--radius) var(--radius) 0 0;padding:1.5rem;width:100%;max-width:580px;max-height:88vh;overflow-y:auto;animation:slideUp 0.2s ease}
+@keyframes slideUp{from{transform:translateY(30px);opacity:0}to{transform:translateY(0);opacity:1}}
+.modal-handle{width:36px;height:4px;background:var(--border);border-radius:2px;margin:0 auto 1.2rem}
+.modal-title{font-family:'Instrument Serif',serif;font-size:21px;margin-bottom:1.25rem;color:var(--ink)}
+.field{margin-bottom:12px}
+.field label{display:block;font-size:11px;font-weight:500;color:var(--ink2);margin-bottom:5px;text-transform:uppercase;letter-spacing:0.06em}
+.field input,.field select,.field textarea{width:100%;padding:10px 13px;font-size:14px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--surface);color:var(--ink);font-family:'DM Sans',sans-serif;transition:border-color 0.15s;outline:none}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--accent)}
+.field textarea{min-height:68px;resize:vertical;line-height:1.5}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.range-wrap{display:flex;align-items:center;gap:10px}
+.range-wrap input[type=range]{flex:1}
+.range-val{font-size:13px;font-weight:500;min-width:32px;color:var(--ink)}
+.modal-footer{display:flex;gap:8px;margin-top:1.25rem}
+.btn-save{flex:1;padding:12px;background:var(--ink);color:white;border:none;border-radius:var(--radius-sm);font-size:14px;font-weight:500;font-family:'DM Sans',sans-serif;cursor:pointer;transition:opacity 0.15s}
+.btn-save:hover{opacity:0.85}
+.btn-cancel{padding:12px 18px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:14px;font-family:'DM Sans',sans-serif;cursor:pointer;background:none;color:var(--ink2)}
+
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--ink);color:white;padding:10px 20px;border-radius:20px;font-size:13px;z-index:999;opacity:0;transition:opacity 0.2s;pointer-events:none}
+.toast.show{opacity:1}
+</style>
+
+<div class="wrap">
+  <h2 class="sr-only">مسیر آموزشی محمدرضا اشرفی</h2>
+  <div class="header-top">
+    <div class="header-title">مسیر <span>آموزشی</span></div>
+    <div class="header-date" id="today-date"></div>
+  </div>
+  <div class="overall-stats">
+    <div class="ostat s-books"><div class="ostat-num" id="stat-books">0</div><div class="ostat-label">کتاب</div></div>
+    <div class="ostat s-articles"><div class="ostat-num" id="stat-articles">0</div><div class="ostat-label">مقاله</div></div>
+    <div class="ostat s-courses"><div class="ostat-num" id="stat-courses">0</div><div class="ostat-label">دوره</div></div>
+    <div class="ostat s-lang"><div class="ostat-num" id="stat-lang">0</div><div class="ostat-label">زبان</div></div>
+    <div class="ostat s-content"><div class="ostat-num" id="stat-content">0</div><div class="ostat-label">محتوا</div></div>
+  </div>
+
+  <div class="tabs-scroll">
+    <div class="tabs">
+      <button class="tab active" onclick="switchTab('books')">📚 کتاب <span class="tc" id="tc-books">0</span></button>
+      <button class="tab" onclick="switchTab('articles')">📄 مقاله <span class="tc" id="tc-articles">0</span></button>
+      <button class="tab" onclick="switchTab('courses')">🎓 دوره <span class="tc" id="tc-courses">0</span></button>
+      <button class="tab" onclick="switchTab('lang')">🌍 زبان <span class="tc" id="tc-lang">0</span></button>
+      <button class="tab" onclick="switchTab('content')">🤝 محتوای ما <span class="tc" id="tc-content">0</span></button>
+      <button class="tab" onclick="switchTab('settings')">⚙️ تنظیمات</button>
+    </div>
+  </div>
+
+  <div id="books" class="section active"></div>
+  <div id="articles" class="section"></div>
+  <div id="courses" class="section"></div>
+  <div id="lang" class="section"></div>
+  <div id="content" class="section"></div>
+  <div id="settings" class="section"></div>
+</div>
+
+<div class="overlay" id="overlay">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title" id="modal-title"></div>
+    <div id="modal-fields"></div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeModal()">انصراف</button>
+      <button class="btn-save" onclick="saveItem()">ذخیره</button>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+<input type="file" class="file-input" id="file-input" accept=".json" onchange="importData(event)">
+
+<script>
+const KEY='mra_learning_v3';
+let data={books:[],articles:[],courses:[],lang:[],content:[]};
+let currentTab='books';
+let editingId=null,editingType=null;
+
+const months=['ژانویه','فوریه','مارس','آوریل','مه','ژوئن','ژوئیه','اوت','سپتامبر','اکتبر','نوامبر','دسامبر'];
+const d=new Date();
+document.getElementById('today-date').textContent=`${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}`;
+
+async function load(){
+  try{const r=await window.storage.get(KEY);if(r&&r.value)data={...data,...JSON.parse(r.value)};}catch(e){}
+  render();
+}
+async function save(){try{await window.storage.set(KEY,JSON.stringify(data));}catch(e){}}
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,6);}
+
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2200);
+}
+
+function switchTab(tab){
+  currentTab=tab;
+  document.querySelectorAll('.tab').forEach((t,i)=>{
+    t.classList.toggle('active',['books','articles','courses','lang','content','settings'][i]===tab);
+  });
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.getElementById(tab).classList.add('active');
+  if(tab==='settings')renderSettings();
+}
+
+function badge(status){
+  const m={reading:['در حال خواندن','b-reading'],done:['تمام شده','b-done'],queued:['در صف','b-queued'],progress:['در حال انجام','b-progress'],completed:['تمام شده','b-done'],active:['فعال','b-active'],shared:['مشترک','b-shared']};
+  const[l,c]=m[status]||['—','b-queued'];
+  return`<span class="badge ${c}">${l}</span>`;
+}
+
+function progressHTML(p,show){
+  if(!show)return'';
+  return`<div class="progress-wrap"><div class="progress-header"><span class="progress-pct">${p}%</span></div><div class="progress-track"><div class="progress-fill" style="width:${p}%"></div></div></div>`;
+}
+
+function noteHTML(n){return n?`<div class="card-note">${n}</div>`:'';}
+
+function footerHTML(meta,id,type,url){
+  return`<div class="card-footer"><span class="card-meta-small">${meta||''}</span><div class="card-actions">${url?`<button class="act-btn link-btn" onclick="openLink('${url}')">باز کردن ↗</button>`:''}<button class="act-btn" onclick="openModal('${type}','${id}')">ویرایش</button><button class="act-btn del" onclick="deleteItem('${type}','${id}')">حذف</button></div></div>`;
+}
+
+function updateCounts(){
+  ['books','articles','courses','lang','content'].forEach(t=>{
+    const el=document.getElementById('tc-'+t);
+    const st=document.getElementById('stat-'+t);
+    if(el)el.textContent=data[t]?.length||0;
+    if(st)st.textContent=data[t]?.length||0;
+  });
+}
+
+function renderSection(type){
+  const icons={books:'📖',articles:'📝',courses:'🎯',lang:'🗣️',content:'🔗'};
+  const ciCls={books:'ci-book',articles:'ci-art',courses:'ci-course',lang:'ci-lang',content:'ci-content'};
+  const labels={books:'کتاب',articles:'مقاله',courses:'دوره',lang:'منبع زبانی',content:'محتوا'};
+  const emptyIcons={books:'📚',articles:'📄',courses:'🎓',lang:'🌍',content:'🤝'};
+  const items=data[type]||[];
+
+  let cards='';
+  items.forEach(item=>{
+    let sub='',meta='',showProg=false,prog=0,url='';
+    if(type==='books'){sub=[item.author,item.lang].filter(Boolean).join(' · ');meta=item.lang||'';showProg=item.status==='reading';prog=item.progress||0;}
+    else if(type==='articles'){sub=[item.source,item.topic].filter(Boolean).join(' · ');meta=item.source||'';url=item.url||'';}
+    else if(type==='courses'){sub=[item.platform,item.cert?'دارای مدرک':null].filter(Boolean).join(' · ');meta=item.platform||'';showProg=item.status==='progress';prog=item.progress||0;}
+    else if(type==='lang'){sub=[item.skill,item.level].filter(Boolean).join(' · ');meta=item.skill||'';url=item.url||'';}
+    else if(type==='content'){sub=[item.category,item.platform].filter(Boolean).join(' · ');meta=item.category||'';url=item.url||'';}
+
+    if(type==='books'&&item.status==='done')prog=100;
+
+    cards+=`<div class="card">
+      <div class="card-top">
+        <div class="card-icon ${ciCls[type]}">${icons[type]}</div>
+        <div class="card-body"><div class="card-title">${item.title}</div><div class="card-sub">${sub}</div></div>
+        <div class="card-badge">${badge(item.status)}</div>
+      </div>
+      ${(showProg||(type==='books'&&item.status==='done'))?progressHTML(prog,true):''}
+      ${noteHTML(item.note)}
+      ${footerHTML(meta,item.id,type,url)}
+    </div>`;
+  });
+
+  document.getElementById(type).innerHTML=`
+    <button class="add-btn" onclick="openModal('${type}')"><span style="font-size:16px">+</span> افزودن ${labels[type]} جدید</button>
+    ${items.length===0?`<div class="empty-state"><div class="empty-icon">${emptyIcons[type]}</div><div class="empty-text">هنوز چیزی اضافه نشده</div></div>`:cards}`;
+}
+
+function renderSettings(){
+  const total=Object.values(data).reduce((s,a)=>s+(a?.length||0),0);
+  const done=data.books.filter(i=>i.status==='done').length+data.courses.filter(i=>i.status==='completed').length+data.articles.filter(i=>i.status==='done').length+data.lang.filter(i=>i.status==='done').length;
+  const sizeKB=Math.round(JSON.stringify(data).length/1024*10)/10;
+
+  document.getElementById('settings').innerHTML=`
+    <div class="settings-section">
+      <div class="settings-title">آمار کلی</div>
+      <div class="settings-card">
+        <div class="stats-detail">
+          <div class="stat-item"><span class="stat-item-label">کل آیتم‌ها</span><span class="stat-item-val">${total}</span></div>
+          <div class="stat-item"><span class="stat-item-label">تمام شده</span><span class="stat-item-val">${done}</span></div>
+          <div class="stat-item"><span class="stat-item-label">کتاب‌ها</span><span class="stat-item-val">${data.books.length}</span></div>
+          <div class="stat-item"><span class="stat-item-label">دوره‌ها</span><span class="stat-item-val">${data.courses.length}</span></div>
+          <div class="stat-item"><span class="stat-item-label">مقالات</span><span class="stat-item-val">${data.articles.length}</span></div>
+          <div class="stat-item"><span class="stat-item-label">حجم داده</span><span class="stat-item-val">${sizeKB} KB</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="settings-section">
+      <div class="settings-title">خروجی داده</div>
+      <div class="settings-card">
+        <div class="settings-row">
+          <div><div class="settings-label">دانلود JSON</div><div class="settings-desc">تمام داده‌هات رو به صورت فایل JSON دانلود کن</div></div>
+          <button class="settings-btn primary" onclick="exportJSON()">دانلود JSON</button>
+        </div>
+      </div>
+      <div class="settings-card">
+        <div class="settings-row">
+          <div><div class="settings-label">کپی در کلیپ‌بورد</div><div class="settings-desc">JSON رو کپی کن برای backup سریع</div></div>
+          <button class="settings-btn" onclick="copyJSON()">کپی JSON</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="settings-section">
+      <div class="settings-title">بارگذاری داده</div>
+      <div class="settings-card">
+        <div class="settings-row">
+          <div><div class="settings-label">Import از JSON</div><div class="settings-desc">فایل JSON قبلی رو بارگذاری کن</div></div>
+          <button class="settings-btn" onclick="document.getElementById('file-input').click()">انتخاب فایل</button>
+        </div>
+        <div class="import-area" onclick="document.getElementById('file-input').click()">
+          <div class="import-area-text">فایل JSON رو اینجا بکش یا کلیک کن</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="settings-section">
+      <div class="settings-title">مدیریت داده</div>
+      <div class="settings-card">
+        <div class="settings-row">
+          <div><div class="settings-label">پاک کردن همه داده‌ها</div><div class="settings-desc">این عملیات برگشت‌پذیر نیست</div></div>
+          <button class="settings-btn danger" onclick="clearAll()">پاک کردن</button>
+        </div>
+      </div>
+    </div>`;
+}
+
+function exportJSON(){
+  const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download=`mrashrafi-learning-${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+  showToast('فایل JSON دانلود شد ✓');
+}
+
+function copyJSON(){
+  navigator.clipboard.writeText(JSON.stringify(data,null,2)).then(()=>showToast('JSON کپی شد ✓')).catch(()=>showToast('خطا در کپی کردن'));
+}
+
+function importData(e){
+  const file=e.target.files[0];
+  if(!file)return;
+  const reader=new FileReader();
+  reader.onload=function(ev){
+    try{
+      const imported=JSON.parse(ev.target.result);
+      if(typeof imported==='object'&&imported!==null){
+        if(confirm('داده‌های فعلی با داده‌های وارد شده جایگزین می‌شوند. ادامه می‌دهید؟')){
+          data={books:[],articles:[],courses:[],lang:[],content:[],...imported};
+          save();render();showToast('داده‌ها با موفقیت وارد شدند ✓');
+        }
+      }else{showToast('فایل JSON معتبر نیست');}
+    }catch(err){showToast('خطا در خواندن فایل');}
+    e.target.value='';
+  };
+  reader.readAsText(file);
+}
+
+function clearAll(){
+  if(confirm('مطمئنی؟ همه داده‌ها پاک می‌شن و برگشتی نیست.')){
+    data={books:[],articles:[],courses:[],lang:[],content:[]};
+    save();render();showToast('همه داده‌ها پاک شد');
+  }
+}
+
+function openModal(type,id){
+  editingId=id||null;editingType=type;
+  const item=id?data[type]?.find(i=>i.id===id):null;
+  const titles={books:'کتاب',articles:'مقاله',courses:'دوره',lang:'منبع زبانی',content:'محتوا'};
+  document.getElementById('modal-title').textContent=(id?'ویرایش ':'افزودن ')+titles[type];
+
+  let f='';
+  if(type==='books'){
+    f=`<div class="field"><label>عنوان کتاب</label><input id="f-title" value="${item?.title||''}" placeholder="نام کتاب"></div>
+    <div class="field-row">
+      <div class="field"><label>نویسنده</label><input id="f-author" value="${item?.author||''}" placeholder="نویسنده"></div>
+      <div class="field"><label>زبان</label><select id="f-lang"><option value="فارسی" ${!item?.lang||item?.lang==='فارسی'?'selected':''}>فارسی</option><option value="انگلیسی" ${item?.lang==='انگلیسی'?'selected':''}>انگلیسی</option></select></div>
+    </div>
+    <div class="field"><label>وضعیت</label><select id="f-status"><option value="queued" ${!item?.status||item?.status==='queued'?'selected':''}>در صف</option><option value="reading" ${item?.status==='reading'?'selected':''}>در حال خواندن</option><option value="done" ${item?.status==='done'?'selected':''}>تمام شده</option></select></div>
+    <div class="field"><label>پیشرفت</label><div class="range-wrap"><input type="range" id="f-progress" min="0" max="100" step="5" value="${item?.progress||0}" oninput="document.getElementById('rv').textContent=this.value+'%'"><span class="range-val" id="rv">${item?.progress||0}%</span></div></div>
+    <div class="field"><label>یادداشت / Insight</label><textarea id="f-note" placeholder="چه چیزی یاد گرفتی؟">${item?.note||''}</textarea></div>`;
+  } else if(type==='articles'){
+    f=`<div class="field"><label>عنوان مقاله</label><input id="f-title" value="${item?.title||''}" placeholder="عنوان مقاله"></div>
+    <div class="field-row">
+      <div class="field"><label>منبع</label><input id="f-source" value="${item?.source||''}" placeholder="HBR, Warc..."></div>
+      <div class="field"><label>موضوع</label><input id="f-topic" value="${item?.topic||''}" placeholder="موضوع"></div>
+    </div>
+    <div class="field"><label>لینک</label><input id="f-url" value="${item?.url||''}" placeholder="https://..."></div>
+    <div class="field"><label>وضعیت</label><select id="f-status"><option value="queued" ${!item?.status||item?.status==='queued'?'selected':''}>در صف</option><option value="done" ${item?.status==='done'?'selected':''}>خوانده شده</option></select></div>
+    <div class="field"><label>یادداشت / Insight</label><textarea id="f-note" placeholder="نکته مهم؟">${item?.note||''}</textarea></div>`;
+  } else if(type==='courses'){
+    f=`<div class="field"><label>نام دوره</label><input id="f-title" value="${item?.title||''}" placeholder="نام دوره"></div>
+    <div class="field-row">
+      <div class="field"><label>پلتفرم</label><input id="f-platform" value="${item?.platform||''}" placeholder="Google, Coursera..."></div>
+      <div class="field"><label>مدرک</label><select id="f-cert"><option value="" ${!item?.cert?'selected':''}>بدون مدرک</option><option value="yes" ${item?.cert?'selected':''}>دارای مدرک</option></select></div>
+    </div>
+    <div class="field"><label>وضعیت</label><select id="f-status"><option value="queued" ${!item?.status||item?.status==='queued'?'selected':''}>در صف</option><option value="progress" ${item?.status==='progress'?'selected':''}>در حال انجام</option><option value="completed" ${item?.status==='completed'?'selected':''}>تمام شده</option></select></div>
+    <div class="field"><label>پیشرفت</label><div class="range-wrap"><input type="range" id="f-progress" min="0" max="100" step="5" value="${item?.progress||0}" oninput="document.getElementById('rv').textContent=this.value+'%'"><span class="range-val" id="rv">${item?.progress||0}%</span></div></div>
+    <div class="field"><label>یادداشت</label><textarea id="f-note" placeholder="نکات این دوره...">${item?.note||''}</textarea></div>`;
+  } else if(type==='lang'){
+    f=`<div class="field"><label>عنوان منبع</label><input id="f-title" value="${item?.title||''}" placeholder="مثلاً: Podcast Business English"></div>
+    <div class="field-row">
+      <div class="field"><label>مهارت</label><select id="f-skill"><option value="مکالمه" ${item?.skill==='مکالمه'?'selected':''}>مکالمه</option><option value="لیسنینگ" ${item?.skill==='لیسنینگ'?'selected':''}>لیسنینگ</option><option value="خواندن" ${item?.skill==='خواندن'?'selected':''}>خواندن</option><option value="نوشتن" ${item?.skill==='نوشتن'?'selected':''}>نوشتن</option><option value="واژگان" ${item?.skill==='واژگان'?'selected':''}>واژگان</option><option value="گرامر" ${item?.skill==='گرامر'?'selected':''}>گرامر</option></select></div>
+      <div class="field"><label>سطح</label><select id="f-level"><option value="B1" ${item?.level==='B1'?'selected':''}>B1</option><option value="B2" ${item?.level==='B2'||!item?.level?'selected':''}>B2</option><option value="C1" ${item?.level==='C1'?'selected':''}>C1</option></select></div>
+    </div>
+    <div class="field"><label>لینک</label><input id="f-url" value="${item?.url||''}" placeholder="https://..."></div>
+    <div class="field"><label>وضعیت</label><select id="f-status"><option value="queued" ${!item?.status||item?.status==='queued'?'selected':''}>در صف</option><option value="active" ${item?.status==='active'?'selected':''}>فعال</option><option value="done" ${item?.status==='done'?'selected':''}>تمام شده</option></select></div>
+    <div class="field"><label>یادداشت</label><textarea id="f-note" placeholder="نکات مفید؟">${item?.note||''}</textarea></div>`;
+  } else if(type==='content'){
+    f=`<div class="field"><label>عنوان محتوا</label><input id="f-title" value="${item?.title||''}" placeholder="مثلاً: ویدیو برندینگ ایکیا"></div>
+    <div class="field-row">
+      <div class="field"><label>دسته‌بندی</label><select id="f-category"><option value="ویدیو" ${item?.category==='ویدیو'?'selected':''}>ویدیو</option><option value="پادکست" ${item?.category==='پادکست'?'selected':''}>پادکست</option><option value="مقاله" ${item?.category==='مقاله'?'selected':''}>مقاله</option><option value="Case Study" ${item?.category==='Case Study'?'selected':''}>Case Study</option><option value="گزارش" ${item?.category==='گزارش'?'selected':''}>گزارش</option><option value="دوره" ${item?.category==='دوره'?'selected':''}>دوره</option></select></div>
+      <div class="field"><label>پلتفرم</label><input id="f-platform" value="${item?.platform||''}" placeholder="YouTube, Spotify..."></div>
+    </div>
+    <div class="field"><label>لینک</label><input id="f-url" value="${item?.url||''}" placeholder="https://..."></div>
+    <div class="field"><label>وضعیت</label><select id="f-status"><option value="queued" ${!item?.status||item?.status==='queued'?'selected':''}>در صف</option><option value="shared" ${item?.status==='shared'?'selected':''}>مشترک</option><option value="done" ${item?.status==='done'?'selected':''}>دیده شده</option></select></div>
+    <div class="field"><label>یادداشت</label><textarea id="f-note" placeholder="چرا مهمه؟ چی یاد گرفتی؟">${item?.note||''}</textarea></div>`;
+  }
+
+  document.getElementById('modal-fields').innerHTML=f;
+  document.getElementById('overlay').classList.add('open');
+}
+
+function closeModal(){document.getElementById('overlay').classList.remove('open');editingId=null;editingType=null;}
+
+function saveItem(){
+  const type=editingType;
+  const title=document.getElementById('f-title')?.value?.trim();
+  if(!title)return;
+  const base={id:editingId||uid(),title};
+
+  const g=id=>document.getElementById(id)?.value||'';
+  if(type==='books')Object.assign(base,{author:g('f-author'),lang:g('f-lang')||'فارسی',status:g('f-status')||'queued',progress:parseInt(g('f-progress'))||0,note:g('f-note')});
+  else if(type==='articles')Object.assign(base,{source:g('f-source'),topic:g('f-topic'),url:g('f-url'),status:g('f-status')||'queued',note:g('f-note')});
+  else if(type==='courses')Object.assign(base,{platform:g('f-platform'),cert:g('f-cert')==='yes',status:g('f-status')||'queued',progress:parseInt(g('f-progress'))||0,note:g('f-note')});
+  else if(type==='lang')Object.assign(base,{skill:g('f-skill')||'لیسنینگ',level:g('f-level')||'B2',url:g('f-url'),status:g('f-status')||'queued',note:g('f-note')});
+  else if(type==='content')Object.assign(base,{category:g('f-category')||'ویدیو',platform:g('f-platform'),url:g('f-url'),status:g('f-status')||'queued',note:g('f-note')});
+
+  if(!data[type])data[type]=[];
+  if(editingId){const idx=data[type].findIndex(i=>i.id===editingId);if(idx!==-1)data[type][idx]=base;}
+  else data[type].push(base);
+
+  save();closeModal();render();showToast('ذخیره شد ✓');
+}
+
+function deleteItem(type,id){
+  if(!confirm('حذف شود؟'))return;
+  data[type]=data[type].filter(i=>i.id!==id);
+  save();render();showToast('حذف شد');
+}
+
+function render(){
+  updateCounts();
+  ['books','articles','courses','lang','content'].forEach(t=>renderSection(t));
+  if(currentTab==='settings')renderSettings();
+}
+
+document.getElementById('overlay').addEventListener('click',function(e){if(e.target===this)closeModal();});
+load();
+</script>

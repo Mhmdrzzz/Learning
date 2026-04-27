@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MRA — Learning Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Geist+Mono:wght@300;400;500&family=Geist:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#0d0d0d;--bg2:#141414;--bg3:#1c1c1c;--bg4:#242424;--border:#2a2a2a;--border2:#333;--text:#f0ede8;--text2:#8a8580;--text3:#4a4845;--gold:#c8a96e;--gold2:#e8d5b0;--gold-dim:rgba(200,169,110,0.1);--green:#4ade80;--green-bg:rgba(74,222,128,0.1);--blue:#60a5fa;--blue-bg:rgba(96,165,250,0.1);--amber:#fbbf24;--amber-bg:rgba(251,191,36,0.1);--rose:#fb7185;--rose-bg:rgba(251,113,133,0.1);--purple:#a78bfa;--purple-bg:rgba(167,139,250,0.1);--teal:#2dd4bf;--teal-bg:rgba(45,212,191,0.1);--r:10px;--r-sm:6px}
+html{background:var(--bg)}
+body{font-family:'Geist',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;-webkit-font-smoothing:antialiased}
+.app{display:flex;min-height:100vh}
+.sidebar{width:220px;flex-shrink:0;background:var(--bg2);border-right:1px solid var(--border);padding:1.5rem 0;position:fixed;top:0;left:0;height:100vh;display:flex;flex-direction:column;z-index:50;overflow-y:auto}
+.main{margin-left:220px;flex:1;padding:2rem;max-width:860px}
+.sidebar-brand{padding:0 1.25rem 1.5rem;border-bottom:1px solid var(--border)}
+.sidebar-initials{font-family:'Cormorant Garamond',serif;font-size:30px;font-weight:300;color:var(--gold);line-height:1;margin-bottom:4px}
+.sidebar-name{font-size:10px;color:var(--text3);letter-spacing:0.1em;text-transform:uppercase}
+.sidebar-nav{padding:1rem 0;flex:1}
+.nav-label{font-size:9px;color:var(--text3);letter-spacing:0.15em;text-transform:uppercase;padding:0 1.25rem;margin-bottom:6px;margin-top:1rem}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 1.25rem;cursor:pointer;transition:all 0.15s;color:var(--text2);font-size:13px;border-left:2px solid transparent;user-select:none}
+.nav-item:hover{color:var(--text);background:var(--bg3)}
+.nav-item.active{color:var(--gold);border-left-color:var(--gold);background:var(--gold-dim)}
+.nav-icon{font-size:13px;width:18px;text-align:center}
+.nav-count{margin-left:auto;font-size:10px;font-family:'Geist Mono',monospace;color:var(--text3);background:var(--bg4);padding:2px 7px;border-radius:20px}
+.nav-item.active .nav-count{color:var(--gold);background:var(--gold-dim)}
+.sidebar-footer{padding:1.25rem;border-top:1px solid var(--border)}
+.sidebar-date{font-size:11px;font-family:'Geist Mono',monospace;color:var(--text3)}
+.page-header{margin-bottom:2rem}
+.page-title{font-family:'Cormorant Garamond',serif;font-size:36px;font-weight:300;color:var(--text);line-height:1.1;margin-bottom:4px}
+.page-title em{font-style:italic;color:var(--gold)}
+.page-sub{font-size:12px;color:var(--text3)}
+.stats-row{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:2rem}
+.stat{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:1rem;position:relative;overflow:hidden;cursor:pointer;transition:all 0.15s}
+.stat:hover{border-color:var(--border2)}
+.stat::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px}
+.stat.s-books::after{background:var(--gold)}.stat.s-articles::after{background:var(--blue)}.stat.s-courses::after{background:var(--green)}.stat.s-lang::after{background:var(--purple)}.stat.s-content::after{background:var(--rose)}
+.stat-n{font-family:'Cormorant Garamond',serif;font-size:30px;font-weight:300;line-height:1}
+.stat-l{font-size:10px;color:var(--text3);margin-top:4px;letter-spacing:0.06em;text-transform:uppercase}
+.section{display:none}.section.active{display:block}
+.add-btn{width:100%;padding:12px;border:1px dashed var(--border2);border-radius:var(--r);background:none;color:var(--text3);font-size:13px;font-family:'Geist',sans-serif;cursor:pointer;transition:all 0.15s;margin-bottom:1rem;display:flex;align-items:center;justify-content:center;gap:7px}
+.add-btn:hover{border-color:var(--gold);color:var(--gold);background:var(--gold-dim)}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:1.1rem 1.25rem;margin-bottom:8px;transition:all 0.15s}
+.card:hover{border-color:var(--border2);background:var(--bg3)}
+.card-top{display:flex;align-items:flex-start;gap:12px}
+.card-icon{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;background:var(--bg4)}
+.card-body{flex:1;min-width:0}
+.card-title{font-size:14px;color:var(--text);margin-bottom:3px;line-height:1.3}
+.card-sub{font-size:12px;color:var(--text3)}
+.card-badge-wrap{flex-shrink:0}
+.badge{display:inline-flex;align-items:center;font-size:10px;font-weight:500;padding:3px 8px;border-radius:20px;letter-spacing:0.04em;font-family:'Geist Mono',monospace;text-transform:uppercase}
+.b-reading{background:var(--blue-bg);color:var(--blue)}.b-done,.b-completed{background:var(--green-bg);color:var(--green)}.b-queued{background:var(--bg4);color:var(--text3)}.b-progress{background:var(--amber-bg);color:var(--amber)}.b-active{background:var(--purple-bg);color:var(--purple)}
+.prog-wrap{margin-top:10px}
+.prog-row{display:flex;justify-content:space-between;margin-bottom:5px}
+.prog-pct{font-size:11px;font-family:'Geist Mono',monospace;color:var(--text3)}
+.prog-track{height:3px;background:var(--bg4);border-radius:2px;overflow:hidden}
+.prog-fill{height:100%;border-radius:2px;background:linear-gradient(90deg,var(--gold),var(--gold2));transition:width 0.4s}
+.card-note{margin-top:10px;padding:9px 12px;background:var(--bg);border-radius:var(--r-sm);font-size:12px;color:var(--text2);line-height:1.5;border-left:2px solid var(--gold-dim)}
+.card-footer{display:flex;align-items:center;justify-content:space-between;margin-top:10px;padding-top:10px;border-top:1px solid var(--border)}
+.card-meta{font-size:10px;color:var(--text3);font-family:'Geist Mono',monospace}
+.card-actions{display:flex;gap:5px}
+.act-btn{font-size:11px;padding:4px 10px;border:1px solid var(--border);border-radius:20px;cursor:pointer;background:none;color:var(--text3);font-family:'Geist',sans-serif;transition:all 0.12s}
+.act-btn:hover{border-color:var(--border2);color:var(--text)}.act-btn.del:hover{border-color:var(--rose);color:var(--rose);background:var(--rose-bg)}.act-btn.lnk{color:var(--blue);border-color:transparent}
+.empty{text-align:center;padding:3rem 1rem;color:var(--text3)}.empty-icon{font-size:28px;margin-bottom:10px;opacity:0.4}.empty-text{font-size:13px}
+.schedule-block{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;margin-bottom:1rem}
+.sch-header{padding:1rem 1.25rem;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+.sch-title{font-size:13px;font-weight:500;color:var(--text)}
+.sch-badge{font-size:10px;font-family:'Geist Mono',monospace;padding:3px 8px;border-radius:20px;background:var(--gold-dim);color:var(--gold)}
+.sch-row{display:flex;align-items:center;gap:14px;padding:12px 1.25rem;border-bottom:1px solid var(--border)}
+.sch-row:last-child{border-bottom:none}
+.sch-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.sch-info{flex:1}.sch-label{font-size:13px;color:var(--text);margin-bottom:2px}.sch-desc{font-size:11px;color:var(--text3)}
+.sch-dur{font-size:11px;font-family:'Geist Mono',monospace;color:var(--text3);white-space:nowrap}
+.brand-group{margin-bottom:1.5rem}
+.brand-group-title{font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--text3);margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--border)}
+.brand-row{display:flex;align-items:flex-start;gap:12px;padding:12px 1rem;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r-sm);margin-bottom:6px;transition:all 0.15s}
+.brand-row:hover{border-color:var(--border2)}.brand-row-icon{font-size:15px;width:20px;text-align:center;flex-shrink:0;margin-top:1px}.brand-row-body{flex:1}.brand-row-title{font-size:13px;color:var(--text);margin-bottom:2px}.brand-row-desc{font-size:11px;color:var(--text3);line-height:1.4}
+.freq-tag{display:inline-block;font-size:10px;font-family:'Geist Mono',monospace;padding:2px 7px;border-radius:20px;background:var(--teal-bg);color:var(--teal);margin-top:5px}
+.set-block{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;margin-bottom:1rem}
+.set-title{font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--text3);padding:1rem 1.25rem;border-bottom:1px solid var(--border)}
+.set-row{display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:1rem 1.25rem;border-bottom:1px solid var(--border)}.set-row:last-child{border-bottom:none}
+.set-label{font-size:13px;color:var(--text)}.set-desc{font-size:11px;color:var(--text3);margin-top:2px}
+.set-btn{padding:7px 16px;border:1px solid var(--border2);border-radius:var(--r-sm);font-size:12px;font-family:'Geist',sans-serif;cursor:pointer;background:none;color:var(--text2);transition:all 0.12s;white-space:nowrap}
+.set-btn:hover{background:var(--bg4);color:var(--text)}.set-btn.primary{background:var(--gold);color:var(--bg);border-color:var(--gold);font-weight:500}.set-btn.primary:hover{opacity:0.85}.set-btn.danger{color:var(--rose);border-color:transparent}.set-btn.danger:hover{background:var(--rose-bg);border-color:var(--rose)}
+.stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:1rem 1.25rem}
+.stat-mini{background:var(--bg);border:1px solid var(--border);border-radius:var(--r-sm);padding:10px 12px;display:flex;justify-content:space-between;align-items:center}
+.stat-mini-label{font-size:11px;color:var(--text3)}.stat-mini-val{font-size:16px;font-family:'Cormorant Garamond',serif}
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:200;align-items:flex-end;justify-content:center;backdrop-filter:blur(4px)}
+.overlay.open{display:flex}
+.modal{background:var(--bg2);border:1px solid var(--border2);border-radius:var(--r) var(--r) 0 0;padding:1.5rem;width:100%;max-width:560px;max-height:90vh;overflow-y:auto;animation:up 0.2s ease}
+@keyframes up{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
+.modal-handle{width:32px;height:3px;background:var(--border2);border-radius:2px;margin:0 auto 1.25rem}
+.modal-title{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:300;margin-bottom:1.25rem}
+.field{margin-bottom:12px}.field label{display:block;font-size:10px;font-weight:500;color:var(--text3);margin-bottom:5px;text-transform:uppercase;letter-spacing:0.08em}
+.field input,.field select,.field textarea{width:100%;padding:10px 12px;font-size:13px;border:1px solid var(--border2);border-radius:var(--r-sm);background:var(--bg);color:var(--text);font-family:'Geist',sans-serif;transition:border-color 0.15s;outline:none}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--gold)}.field select option{background:var(--bg2)}.field textarea{min-height:72px;resize:vertical;line-height:1.5}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.range-wrap{display:flex;align-items:center;gap:10px}.range-wrap input[type=range]{flex:1;accent-color:var(--gold)}.range-val{font-size:13px;font-family:'Geist Mono',monospace;min-width:32px;color:var(--gold)}
+.modal-foot{display:flex;gap:8px;margin-top:1.25rem}
+.btn-save{flex:1;padding:11px;background:var(--gold);color:var(--bg);border:none;border-radius:var(--r-sm);font-size:13px;font-weight:500;font-family:'Geist',sans-serif;cursor:pointer;transition:opacity 0.15s}.btn-save:hover{opacity:0.85}
+.btn-cancel{padding:11px 18px;border:1px solid var(--border2);border-radius:var(--r-sm);font-size:13px;font-family:'Geist',sans-serif;cursor:pointer;background:none;color:var(--text3)}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--bg4);border:1px solid var(--border2);color:var(--text);padding:10px 20px;border-radius:20px;font-size:11px;z-index:999;opacity:0;transition:opacity 0.2s;pointer-events:none;font-family:'Geist Mono',monospace;letter-spacing:0.04em}
+.toast.show{opacity:1}
+.file-input{display:none}
+</style>
+</head>
+<body>
+<div class="app">
+<aside class="sidebar">
+  <div class="sidebar-brand">
+    <div class="sidebar-initials">MRA</div>
+    <div class="sidebar-name">Learning Dashboard</div>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-label">Library</div>
+    <div class="nav-item active" onclick="sw('books')"><span class="nav-icon">📚</span> Books <span class="nav-count" id="nc-books">0</span></div>
+    <div class="nav-item" onclick="sw('articles')"><span class="nav-icon">📄</span> Articles <span class="nav-count" id="nc-articles">0</span></div>
+    <div class="nav-item" onclick="sw('courses')"><span class="nav-icon">🎓</span> Courses <span class="nav-count" id="nc-courses">0</span></div>
+    <div class="nav-item" onclick="sw('lang')"><span class="nav-icon">🌍</span> Language <span class="nav-count" id="nc-lang">0</span></div>
+    <div class="nav-item" onclick="sw('content')"><span class="nav-icon">🔗</span> Resources <span class="nav-count" id="nc-content">0</span></div>
+    <div class="nav-label">Strategy</div>
+    <div class="nav-item" onclick="sw('brand')"><span class="nav-icon">🎯</span> Personal Brand</div>
+    <div class="nav-item" onclick="sw('schedule')"><span class="nav-icon">📅</span> Daily Plan</div>
+    <div class="nav-label">System</div>
+    <div class="nav-item" onclick="sw('settings')"><span class="nav-icon">⚙️</span> Settings</div>
+  </nav>
+  <div class="sidebar-footer"><div class="sidebar-date" id="today-date"></div></div>
+</aside>
+<main class="main">
+  <div class="page-header">
+    <div class="page-title">Learning <em>Path</em></div>
+    <div class="page-sub">Mohammadreza Ashrafi — Personal Growth System</div>
+  </div>
+  <div class="stats-row">
+    <div class="stat s-books" onclick="sw('books')"><div class="stat-n" id="stat-books">0</div><div class="stat-l">Books</div></div>
+    <div class="stat s-articles" onclick="sw('articles')"><div class="stat-n" id="stat-articles">0</div><div class="stat-l">Articles</div></div>
+    <div class="stat s-courses" onclick="sw('courses')"><div class="stat-n" id="stat-courses">0</div><div class="stat-l">Courses</div></div>
+    <div class="stat s-lang" onclick="sw('lang')"><div class="stat-n" id="stat-lang">0</div><div class="stat-l">Language</div></div>
+    <div class="stat s-content" onclick="sw('content')"><div class="stat-n" id="stat-content">0</div><div class="stat-l">Resources</div></div>
+  </div>
+  <div id="books" class="section active"></div>
+  <div id="articles" class="section"></div>
+  <div id="courses" class="section"></div>
+  <div id="lang" class="section"></div>
+  <div id="content" class="section"></div>
+  <div id="brand" class="section"></div>
+  <div id="schedule" class="section"></div>
+  <div id="settings" class="section"></div>
+</main>
+</div>
+<div class="overlay" id="overlay"><div class="modal"><div class="modal-handle"></div><div class="modal-title" id="mtitle"></div><div id="mfields"></div><div class="modal-foot"><button class="btn-cancel" onclick="closeMod()">Cancel</button><button class="btn-save" onclick="saveItem()">Save</button></div></div></div>
+<div class="toast" id="toast"></div>
+<input type="file" class="file-input" id="file-input" accept=".json" onchange="importData(event)">
+<script>
+const SEED={books:[{id:'b1',title:'Ogilvy on Advertising',author:'David Ogilvy',lang:'English',status:'done',progress:100,note:'Classic — the foundation of advertising thinking.'},{id:'b2',title:'This Is Marketing',author:'Seth Godin',lang:'Persian',status:'reading',progress:0,note:'Month 1 — start here. Get Amookhte translation.'},{id:'b3',title:'Positioning: The Battle for Your Mind',author:'Al Ries & Jack Trout',lang:'Persian',status:'queued',progress:0,note:'Month 2 — foundation of brand strategy'},{id:'b4',title:'Influence',author:'Robert Cialdini',lang:'Persian',status:'queued',progress:0,note:'Month 3 — consumer psychology'},{id:'b5',title:'Building a StoryBrand',author:'Donald Miller',lang:'Persian',status:'queued',progress:0,note:'Month 4 — brand narrative framework'},{id:'b6',title:'Contagious',author:'Jonah Berger',lang:'Persian',status:'queued',progress:0,note:'Month 5 — why things spread'},{id:'b7',title:'Good Strategy Bad Strategy',author:'Richard Rumelt',lang:'English',status:'queued',progress:0,note:'Month 6 — real strategic thinking for CEOs'},{id:'b8',title:'Thinking, Fast and Slow',author:'Daniel Kahneman',lang:'Persian',status:'queued',progress:0,note:'Month 7 — decision & consumer psychology'},{id:'b9',title:'Creativity, Inc.',author:'Ed Catmull',lang:'Persian',status:'queued',progress:0,note:'Month 8 — creative culture, from Pixar'},{id:'b10',title:'Obviously Awesome',author:'April Dunford',lang:'English',status:'queued',progress:0,note:'Month 9 — positioning for yourself and your agency'},{id:'b11',title:'The Advice Trap',author:'Michael Bungay Stanier',lang:'English',status:'queued',progress:0,note:'Month 10 — how to be an advisor, not just an executor'},{id:'b12',title:'Predictably Irrational',author:'Dan Ariely',lang:'Persian',status:'queued',progress:0,note:'Month 11 — irrational consumer behavior'},{id:'b13',title:'Building a Second Brain',author:'Tiago Forte',lang:'English',status:'queued',progress:0,note:'Month 12 — knowledge management system'},{id:'b14',title:'Meditations',author:'Marcus Aurelius',lang:'Persian',status:'queued',progress:0,note:'Read in parallel — mental clarity as a leader'}],articles:[],courses:[{id:'c1',title:'HubSpot Content Marketing Certification',platform:'HubSpot Academy',cert:true,status:'queued',progress:0,note:'Free — Priority #1, start this week'},{id:'c2',title:'HubSpot Social Media Certification',platform:'HubSpot Academy',cert:true,status:'queued',progress:0,note:'Free — run in parallel'},{id:'c3',title:'LinkedIn Marketing Labs',platform:'LinkedIn',cert:true,status:'queued',progress:0,note:'Free — shows directly on your LinkedIn profile'},{id:'c4',title:'Google Ads Certification',platform:'Google Skillshop',cert:true,status:'queued',progress:0,note:'Free — direct from Google, not Coursera'},{id:'c5',title:'Brand Strategy',platform:'CXL Institute',cert:true,status:'queued',progress:0,note:'1-month subscription — complete with c6 & c7 in same month'},{id:'c6',title:'Digital Psychology & Persuasion',platform:'CXL Institute',cert:true,status:'queued',progress:0,note:'1-month subscription — same month as Brand Strategy'},{id:'c7',title:'Content Marketing',platform:'CXL Institute',cert:true,status:'queued',progress:0,note:'1-month subscription — 3 CXL courses in one month'},{id:'c8',title:'Brand Strategy Course',platform:'Brand Master Academy',cert:true,status:'queued',progress:0,note:'Single course purchase — Phase 2, Month 6–12'},{id:'c9',title:'CIM Digital Marketing Certificate',platform:'CIM',cert:true,status:'queued',progress:0,note:'Most credible UK marketing credential — Phase 2'},{id:'c10',title:'Advanced Certificate in Brand Strategy & Digital Marketing',platform:'Kellogg Executive Education',cert:true,status:'queued',progress:0,note:'Year 2 — global credibility'}],lang:[{id:'l1',title:'American English File — Online Class',skill:'Speaking',level:'B2',url:'',status:'active',note:'Sun & Tue 10:30–12:00 | Thu 10:00–11:30 — Iranian teacher, online'},{id:'l2',title:'iTalki — Native Speaker',skill:'Speaking',level:'C1',url:'https://www.italki.com',status:'queued',note:'45 min/week — Business English, native accent exposure'},{id:'l3',title:'Marketing School Podcast',skill:'Listening',level:'B2',url:'https://marketingschool.io',status:'queued',note:'Daily 10 min — Neil Patel & Eric Siu'},{id:'l4',title:'How I Built This',skill:'Listening',level:'B2',url:'https://www.npr.org/series/how-i-built-this',status:'queued',note:'Weekly — business storytelling, clear accent'},{id:'l5',title:'Grammarly',skill:'Writing',level:'C1',url:'https://www.grammarly.com',status:'queued',note:'Install now — use for all English writing'},{id:'l6',title:'LinkedIn Posts in English',skill:'Writing',level:'B2',url:'https://www.linkedin.com',status:'queued',note:'1 post per 4–5 Persian posts — build English footprint'}],content:[{id:'ct1',title:"Seth Godin's Blog",category:'Article',platform:'seths.blog',url:'https://seths.blog',status:'queued',note:'Daily — short, one insight per day. Essential.'},{id:'ct2',title:'LinkedIn Feed — Thought Leaders',category:'Article',platform:'LinkedIn',url:'https://linkedin.com',status:'queued',note:'Daily — follow top marketing minds, engage'},{id:'ct3',title:'Motamem.org',category:'Article',platform:'motamem.org',url:'https://motamem.org',status:'queued',note:'Weekly — Persian management & marketing'},{id:'ct4',title:'Marketing Week',category:'Article',platform:'marketingweek.com',url:'https://www.marketingweek.com',status:'queued',note:'Weekly — industry news and analysis'},{id:'ct5',title:'Campaign Magazine',category:'Article',platform:'campaignlive.com',url:'https://www.campaignlive.com',status:'queued',note:'Weekly — advertising and creativity'},{id:'ct6',title:'WARC',category:'Report',platform:'warc.com',url:'https://www.warc.com',status:'queued',note:'Weekly — case studies and research'},{id:'ct7',title:'Kantar BrandZ Reports',category:'Report',platform:'Kantar',url:'https://www.kantar.com/campaigns/brandz',status:'queued',note:'Monthly — global brand reports'},{id:'ct8',title:'Dentsu Global Ad Spend Report',category:'Report',platform:'Dentsu',url:'https://www.dentsu.com/news-and-insights',status:'queued',note:'Monthly — advertising budget data'},{id:'ct9',title:'Nielsen Annual Marketing Report',category:'Report',platform:'Nielsen',url:'https://www.nielsen.com/insights',status:'queued',note:'Monthly — marketing trends'},{id:'ct10',title:'Think with Google',category:'Article',platform:'thinkwithgoogle.com',url:'https://www.thinkwithgoogle.com',status:'queued',note:'Monthly — consumer insights and data'}]};
+
+const KEY='mra_tracker_v4';
+let data={books:[],articles:[],courses:[],lang:[],content:[]};
+let cur='books',eId=null,eType=null;
+
+function load(){
+  try{const r=localStorage.getItem(KEY);data=r?{...SEED,...JSON.parse(r)}:JSON.parse(JSON.stringify(SEED));if(!r)localStorage.setItem(KEY,JSON.stringify(data));}catch(e){data=JSON.parse(JSON.stringify(SEED));}
+  const d=new Date();const ms=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];const ds=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  document.getElementById('today-date').textContent=`${ds[d.getDay()]}, ${ms[d.getMonth()]} ${d.getDate()}`;
+  render();
+}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(data));}catch(e){}}
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,6);}
+function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2000);}
+
+function sw(tab){
+  cur=tab;
+  document.querySelectorAll('.nav-item').forEach((el,i)=>el.classList.toggle('active',['books','articles','courses','lang','content','brand','schedule','settings'][i]===tab));
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.getElementById(tab).classList.add('active');
+  if(tab==='brand')rBrand();if(tab==='schedule')rSched();if(tab==='settings')rSet();
+}
+
+function bdg(s){const m={reading:['Reading','b-reading'],done:['Done','b-done'],queued:['Queued','b-queued'],progress:['In Progress','b-progress'],completed:['Completed','b-completed'],active:['Active','b-active']};const[l,c]=m[s]||['—','b-queued'];return`<span class="badge ${c}">${l}</span>`;}
+
+function upd(){['books','articles','courses','lang','content'].forEach(t=>{const n=data[t]?.length||0;const e=document.getElementById('nc-'+t),s=document.getElementById('stat-'+t);if(e)e.textContent=n;if(s)s.textContent=n;});}
+
+function rSec(type){
+  const ico={books:'📖',articles:'📝',courses:'🎯',lang:'🗣️',content:'🔗'};
+  const lbl={books:'Book',articles:'Article',courses:'Course',lang:'Language Resource',content:'Resource'};
+  const emp={books:'📚',articles:'📄',courses:'🎓',lang:'🌍',content:'🔗'};
+  const items=data[type]||[];let html=`<button class="add-btn" onclick="openMod('${type}')">+ Add ${lbl[type]}</button>`;
+  if(!items.length){html+=`<div class="empty"><div class="empty-icon">${emp[type]}</div><div class="empty-text">Nothing here yet</div></div>`;}
+  else items.forEach(item=>{
+    let sub='',meta='',sp=false,prog=0,url='';
+    if(type==='books'){sub=[item.author,item.lang].filter(Boolean).join(' · ');meta=item.lang||'';sp=item.status==='reading';prog=item.progress||0;if(item.status==='done')prog=100;}
+    else if(type==='articles'){sub=[item.source,item.topic].filter(Boolean).join(' · ');meta=item.source||'';url=item.url||'';}
+    else if(type==='courses'){sub=[item.platform,item.cert?'Certificate':null].filter(Boolean).join(' · ');meta=item.platform||'';sp=item.status==='progress';prog=item.progress||0;}
+    else if(type==='lang'){sub=[item.skill,item.level].filter(Boolean).join(' · ');meta=item.skill||'';url=item.url||'';}
+    else if(type==='content'){sub=[item.category,item.platform].filter(Boolean).join(' · ');meta=item.category||'';url=item.url||'';}
+    const ph=(sp||(type==='books'&&item.status==='done'))?`<div class="prog-wrap"><div class="prog-row"><span class="prog-pct">${prog}%</span></div><div class="prog-track"><div class="prog-fill" style="width:${prog}%"></div></div></div>`:'';
+    const nh=item.note?`<div class="card-note">${item.note}</div>`:'';
+    const lb=url?`<button class="act-btn lnk" onclick="ol('${url}')">Open ↗</button>`:'';
+    html+=`<div class="card"><div class="card-top"><div class="card-icon">${ico[type]}</div><div class="card-body"><div class="card-title">${item.title}</div><div class="card-sub">${sub}</div></div><div class="card-badge-wrap">${bdg(item.status)}</div></div>${ph}${nh}<div class="card-footer"><span class="card-meta">${meta}</span><div class="card-actions">${lb}<button class="act-btn" onclick="openMod('${type}','${item.id}')">Edit</button><button class="act-btn del" onclick="del('${type}','${item.id}')">Delete</button></div></div></div>`;
+  });
+  document.getElementById(type).innerHTML=html;
+}
+
+function rSched(){
+  const d=new Date();const isCls=[0,2,4].includes(d.getDay());
+  const reg=[{dot:'#c8a96e',l:'Book Reading',d:'This Is Marketing — current book',t:'60 min'},{dot:'#60a5fa',l:'Reading Resources',d:'Seth Godin, Motamem, Marketing Week',t:'30 min'},{dot:'#4ade80',l:'Personal Brand',d:'LinkedIn content, writing, blog',t:'60 min'}];
+  const cls=[{dot:'#a78bfa',l:'Language Class',d:'American English File — online',t:'60–90 min'},{dot:'#c8a96e',l:'Book Reading',d:'This Is Marketing — current book',t:'30 min'},{dot:'#60a5fa',l:'Reading Resources',d:'Seth Godin, Motamem, Marketing Week',t:'30 min'},{dot:'#4ade80',l:'Personal Brand',d:'LinkedIn content, writing, blog',t:'60 min'}];
+  function bk(title,items,today){return`<div class="schedule-block"><div class="sch-header"><div class="sch-title">${title}</div>${today?'<div class="sch-badge">Today</div>':''}</div>${items.map(i=>`<div class="sch-row"><div class="sch-dot" style="background:${i.dot}"></div><div class="sch-info"><div class="sch-label">${i.l}</div><div class="sch-desc">${i.d}</div></div><div class="sch-dur">${i.t}</div></div>`).join('')}</div>`;}
+  document.getElementById('schedule').innerHTML=`<div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:1rem 1.25rem;margin-bottom:1rem;display:flex;justify-content:space-between;align-items:center"><div><div style="font-size:13px;font-weight:500">Daily Total</div><div style="font-size:11px;color:var(--text3);margin-top:2px">2.5 hours — consistent, every day</div></div><div style="font-family:'Cormorant Garamond',serif;font-size:30px;color:var(--gold)">2.5h</div></div>${bk('Regular Days — Sat, Mon, Wed, Fri',reg,!isCls)}${bk('Class Days — Sun, Tue, Thu',cls,isCls)}`;
+}
+
+function rBrand(){
+  const gs=[{t:'Content Creation',items:[{i:'✍️',t:'LinkedIn Post',d:'3 posts/week — story, insight, or real experience',f:'3× / week'},{i:'📝',t:'Blog Article',d:'800–1500 words on mrashrafi.com',f:'Monthly'},{i:'🔁',t:'Re-share with Analysis',d:'Industry content with your own POV',f:'Weekly'}]},{t:'Authority Building',items:[{i:'💬',t:'Engage on Others\' Posts',d:'Expert comments on thought leaders in your field',f:'5× / week'},{i:'🤝',t:'New Connections',d:'5–10 targeted: marketers, CMOs, agency leads',f:'Weekly'},{i:'📊',t:'Analytics Review',d:'What performed? What topic drove engagement?',f:'Weekly'}]},{t:'Long-term Growth',items:[{i:'🎙️',t:'Podcast Guest',d:'Iranian marketing podcasts — build local credibility first',f:'Monthly'},{i:'📰',t:'Write for Trade Press',d:'Digikala Mag or Iranian marketing media',f:'Monthly'},{i:'🔍',t:'Personal Brand Audit',d:'Is your positioning landing? Get feedback.',f:'Monthly'}]},{t:'Infrastructure — One Time',items:[{i:'🌐',t:'Launch mrashrafi.com',d:'Design with new positioning — About, Blog, Contact',f:'Once'},{i:'🖼️',t:'Update LinkedIn Profile',d:'Headline, About, Featured — new positioning',f:'Once'},{i:'📸',t:'Professional Photo',d:'Profile photo & LinkedIn banner — consistent',f:'Once'}]}];
+  document.getElementById('brand').innerHTML=gs.map(g=>`<div class="brand-group"><div class="brand-group-title">${g.t}</div>${g.items.map(i=>`<div class="brand-row"><div class="brand-row-icon">${i.i}</div><div class="brand-row-body"><div class="brand-row-title">${i.t}</div><div class="brand-row-desc">${i.d}</div><span class="freq-tag">${i.f}</span></div></div>`).join('')}</div>`).join('');
+}
+
+function rSet(){
+  const tot=Object.values(data).reduce((s,a)=>s+(a?.length||0),0);
+  const done=(data.books||[]).filter(i=>i.status==='done').length+(data.courses||[]).filter(i=>i.status==='completed').length+(data.articles||[]).filter(i=>i.status==='done').length+(data.lang||[]).filter(i=>i.status==='done').length;
+  const kb=Math.round(JSON.stringify(data).length/1024*10)/10;
+  document.getElementById('settings').innerHTML=`<div class="set-block"><div class="set-title">Overview</div><div class="stats-grid"><div class="stat-mini"><span class="stat-mini-label">Total Items</span><span class="stat-mini-val">${tot}</span></div><div class="stat-mini"><span class="stat-mini-label">Completed</span><span class="stat-mini-val">${done}</span></div><div class="stat-mini"><span class="stat-mini-label">Books</span><span class="stat-mini-val">${(data.books||[]).length}</span></div><div class="stat-mini"><span class="stat-mini-label">Courses</span><span class="stat-mini-val">${(data.courses||[]).length}</span></div><div class="stat-mini"><span class="stat-mini-label">Resources</span><span class="stat-mini-val">${(data.content||[]).length}</span></div><div class="stat-mini"><span class="stat-mini-label">Data Size</span><span class="stat-mini-val">${kb}KB</span></div></div></div><div class="set-block"><div class="set-title">Export</div><div class="set-row"><div><div class="set-label">Download JSON</div><div class="set-desc">Download all data as a backup file</div></div><button class="set-btn primary" onclick="expJ()">Download JSON</button></div><div class="set-row"><div><div class="set-label">Copy to Clipboard</div><div class="set-desc">Quick backup</div></div><button class="set-btn" onclick="cpJ()">Copy JSON</button></div></div><div class="set-block"><div class="set-title">Import</div><div class="set-row"><div><div class="set-label">Load from JSON</div><div class="set-desc">Restore from a backup file</div></div><button class="set-btn" onclick="document.getElementById('file-input').click()">Choose File</button></div></div><div class="set-block"><div class="set-title">Danger Zone</div><div class="set-row"><div><div class="set-label">Reset All Data</div><div class="set-desc">Restore original seed data</div></div><button class="set-btn danger" onclick="rst()">Reset</button></div></div>`;
+}
+
+function expJ(){const b=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=`mrashrafi-learning-${new Date().toISOString().slice(0,10)}.json`;a.click();toast('Downloaded ✓');}
+function cpJ(){navigator.clipboard.writeText(JSON.stringify(data,null,2)).then(()=>toast('Copied ✓')).catch(()=>toast('Failed'));}
+function importData(e){const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=function(ev){try{const imp=JSON.parse(ev.target.result);if(typeof imp==='object'&&imp!==null){if(confirm('Replace current data?')){data={books:[],articles:[],courses:[],lang:[],content:[],...imp};save();render();toast('Imported ✓');}}else toast('Invalid file');}catch{toast('Error reading file');}e.target.value='';};r.readAsText(f);}
+function rst(){if(confirm('Reset to original data?')){data=JSON.parse(JSON.stringify(SEED));save();render();toast('Reset ✓');}}
+
+function openMod(type,id){
+  eId=id||null;eType=type;
+  const item=id?data[type]?.find(i=>i.id===id):null;
+  const tls={books:'Book',articles:'Article',courses:'Course',lang:'Language Resource',content:'Resource'};
+  document.getElementById('mtitle').textContent=(id?'Edit ':'Add ')+tls[type];
+  let f='';
+  if(type==='books'){f=`<div class="field"><label>Title</label><input id="f-title" value="${item?.title||''}" placeholder="Book title"></div><div class="field-row"><div class="field"><label>Author</label><input id="f-author" value="${item?.author||''}" placeholder="Author"></div><div class="field"><label>Language</label><select id="f-lang"><option value="Persian" ${!item?.lang||item?.lang==='Persian'?'selected':''}>Persian</option><option value="English" ${item?.lang==='English'?'selected':''}>English</option></select></div></div><div class="field"><label>Status</label><select id="f-status"><option value="queued" ${!item?.status||item?.status==='queued'?'selected':''}>Queued</option><option value="reading" ${item?.status==='reading'?'selected':''}>Reading</option><option value="done" ${item?.status==='done'?'selected':''}>Done</option></select></div><div class="field"><label>Progress</label><div class="range-wrap"><input type="range" id="f-progress" min="0" max="100" step="5" value="${item?.progress||0}" oninput="document.getElementById('rv').textContent=this.value+'%'"><span class="range-val" id="rv">${item?.progress||0}%</span></div></div><div class="field"><label>Notes / Insight</label><textarea id="f-note" placeholder="What did you learn?">${item?.note||''}</textarea></div>`;}
+  else if(type==='articles'){f=`<div class="field"><label>Title</label><input id="f-title" value="${item?.title||''}" placeholder="Article title"></div><div class="field-row"><div class="field"><label>Source</label><input id="f-source" value="${item?.source||''}" placeholder="HBR, WARC..."></div><div class="field"><label>Topic</label><input id="f-topic" value="${item?.topic||''}" placeholder="Topic"></div></div><div class="field"><label>URL</label><input id="f-url" value="${item?.url||''}" placeholder="https://..."></div><div class="field"><label>Status</label><select id="f-status"><option value="queued" ${!item?.status||item?.status==='queued'?'selected':''}>Queued</option><option value="done" ${item?.status==='done'?'selected':''}>Read</option></select></div><div class="field"><label>Notes</label><textarea id="f-note" placeholder="Key takeaway?">${item?.note||''}</textarea></div>`;}
+  else if(type==='courses'){f=`<div class="field"><label>Course Title</label><input id="f-title" value="${item?.title||''}" placeholder="Course name"></div><div class="field-row"><div class="field"><label>Platform</label><input id="f-platform" value="${item?.platform||''}" placeholder="HubSpot, CXL..."></div><div class="field"><label>Certificate</label><select id="f-cert"><option value="" ${!item?.cert?'selected':''}>No</option><option value="yes" ${item?.cert?'selected':''}>Yes</option></select></div></div><div class="field"><label>Status</label><select id="f-status"><option value="queued" ${!item?.status||item?.status==='queued'?'selected':''}>Queued</option><option value="progress" ${item?.status==='progress'?'selected':''}>In Progress</option><option value="completed" ${item?.status==='completed'?'selected':''}>Completed</option></select></div><div class="field"><label>Progress</label><div class="range-wrap"><input type="range" id="f-progress" min="0" max="100" step="5" value="${item?.progress||0}" oninput="document.getElementById('rv').textContent=this.value+'%'"><span class="range-val" id="rv">${item?.progress||0}%</span></div></div><div class="field"><label>Notes</label><textarea id="f-note" placeholder="Notes...">${item?.note||''}</textarea></div>`;}
+  else if(type==='lang'){f=`<div class="field"><label>Resource Title</label><input id="f-title" value="${item?.title||''}" placeholder="e.g. Marketing School Podcast"></div><div class="field-row"><div class="field"><label>Skill</label><select id="f-skill"><option value="Speaking" ${item?.skill==='Speaking'?'selected':''}>Speaking</option><option value="Listening" ${item?.skill==='Listening'?'selected':''}>Listening</option><option value="Reading" ${item?.skill==='Reading'?'selected':''}>Reading</option><option value="Writing" ${item?.skill==='Writing'?'selected':''}>Writing</option><option value="Vocabulary" ${item?.skill==='Vocabulary'?'selected':''}>Vocabulary</option></select></div><div class="field"><label>Level</label><select id="f-level"><option value="B1" ${item?.level==='B1'?'selected':''}>B1</option><option value="B2" ${item?.level==='B2'||!item?.level?'selected':''}>B2</option><option value="C1" ${item?.level==='C1'?'selected':''}>C1</option></select></div></div><div class="field"><label>URL</label><input id="f-url" value="${item?.url||''}" placeholder="https://..."></div><div class="field"><label>Status</label><select id="f-status"><option value="queued" ${!item?.status||item?.status==='queued'?'selected':''}>Queued</option><option value="active" ${item?.status==='active'?'selected':''}>Active</option><option value="done" ${item?.status==='done'?'selected':''}>Done</option></select></div><div class="field"><label>Notes</label><textarea id="f-note" placeholder="Tips?">${item?.note||''}</textarea></div>`;}
+  else if(type==='content'){f=`<div class="field"><label>Title</label><input id="f-title" value="${item?.title||''}" placeholder="Resource title"></div><div class="field-row"><div class="field"><label>Category</label><select id="f-category"><option value="Article" ${item?.category==='Article'?'selected':''}>Article</option><option value="Report" ${item?.category==='Report'?'selected':''}>Report</option><option value="Podcast" ${item?.category==='Podcast'?'selected':''}>Podcast</option><option value="Video" ${item?.category==='Video'?'selected':''}>Video</option><option value="Case Study" ${item?.category==='Case Study'?'selected':''}>Case Study</option></select></div><div class="field"><label>Platform</label><input id="f-platform" value="${item?.platform||''}" placeholder="YouTube..."></div></div><div class="field"><label>URL</label><input id="f-url" value="${item?.url||''}" placeholder="https://..."></div><div class="field"><label>Status</label><select id="f-status"><option value="queued" ${!item?.status||item?.status==='queued'?'selected':''}>Queued</option><option value="done" ${item?.status==='done'?'selected':''}>Read</option></select></div><div class="field"><label>Notes</label><textarea id="f-note" placeholder="Why important?">${item?.note||''}</textarea></div>`;}
+  document.getElementById('mfields').innerHTML=f;document.getElementById('overlay').classList.add('open');
+}
+
+function closeMod(){document.getElementById('overlay').classList.remove('open');eId=null;eType=null;}
+
+function saveItem(){
+  const type=eType;const title=document.getElementById('f-title')?.value?.trim();if(!title)return;
+  const base={id:eId||uid(),title};const g=id=>document.getElementById(id)?.value||'';
+  if(type==='books')Object.assign(base,{author:g('f-author'),lang:g('f-lang')||'Persian',status:g('f-status')||'queued',progress:parseInt(g('f-progress'))||0,note:g('f-note')});
+  else if(type==='articles')Object.assign(base,{source:g('f-source'),topic:g('f-topic'),url:g('f-url'),status:g('f-status')||'queued',note:g('f-note')});
+  else if(type==='courses')Object.assign(base,{platform:g('f-platform'),cert:g('f-cert')==='yes',status:g('f-status')||'queued',progress:parseInt(g('f-progress'))||0,note:g('f-note')});
+  else if(type==='lang')Object.assign(base,{skill:g('f-skill')||'Listening',level:g('f-level')||'B2',url:g('f-url'),status:g('f-status')||'queued',note:g('f-note')});
+  else if(type==='content')Object.assign(base,{category:g('f-category')||'Article',platform:g('f-platform'),url:g('f-url'),status:g('f-status')||'queued',note:g('f-note')});
+  if(!data[type])data[type]=[];
+  if(eId){const idx=data[type].findIndex(i=>i.id===eId);if(idx!==-1)data[type][idx]=base;}else data[type].push(base);
+  save();closeMod();render();toast('Saved ✓');
+}
+
+function del(type,id){if(!confirm('Delete?'))return;data[type]=data[type].filter(i=>i.id!==id);save();render();toast('Deleted');}
+function ol(url){if(url)window.open(url,'_blank');}
+document.getElementById('overlay').addEventListener('click',function(e){if(e.target===this)closeMod();});
+
+function render(){upd();['books','articles','courses','lang','content'].forEach(t=>rSec(t));if(cur==='brand')rBrand();if(cur==='schedule')rSched();if(cur==='settings')rSet();}
+load();
+</script>
+</body>
+</html>

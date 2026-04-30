@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MRA — Daily Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Fraunces:ital,opsz,wght@0,9..144,300;1,9..144,300&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#faf8f4;--bg2:#f4f1eb;--bg3:#e8e2d9;--ink:#1a1714;--ink2:#6b6560;--ink3:#b8b2aa;--bdr:#e4dfd5;--or:#f97316;--or2:#fff7ed;--or3:#fed7aa;--tl:#0d9488;--tl2:#f0fdfa;--tl3:#99f6e4;--vi:#7c3aed;--vi2:#f5f3ff;--vi3:#ddd6fe;--gn:#16a34a;--gn2:#f0fdf4;--gn3:#bbf7d0;--am:#d97706;--am2:#fffbeb;--r:14px;--rs:10px}
+body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--ink);min-height:100vh;-webkit-font-smoothing:antialiased}
+.w{max-width:440px;margin:0 auto;padding-bottom:2rem}
+.hdr{background:#fff;border-bottom:1px solid var(--bdr);padding:1.25rem 1.25rem 1rem}
+.hdr-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:.75rem}
+.greeting{font-family:'Fraunces',serif;font-size:22px;font-weight:300;line-height:1.2}
+.greeting em{font-style:italic;color:var(--or)}
+.hdr-date{font-size:11px;color:var(--ink3);font-weight:600;letter-spacing:.07em;text-transform:uppercase;margin-top:2px}
+.av{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#f97316,#fb923c);display:flex;align-items:center;justify-content:center;font-family:'Fraunces',serif;font-size:15px;color:#fff}
+.pc{margin:1rem 1.25rem;background:#fff;border:1.5px solid var(--bdr);border-radius:var(--r);padding:1rem;display:flex;align-items:center;gap:1rem;box-shadow:0 2px 10px rgba(0,0,0,.04)}
+.ring{position:relative;width:68px;height:68px;flex-shrink:0}
+.ring svg{transform:rotate(-90deg)}
+.rbg{fill:none;stroke:var(--bg3);stroke-width:7}
+.rf{fill:none;stroke-width:7;stroke-linecap:round;stroke:#f97316;transition:stroke-dashoffset .6s cubic-bezier(.4,0,.2,1)}
+.ri{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.rpct{font-size:15px;font-weight:800}
+.rlbl{font-size:9px;color:var(--ink3);font-weight:600;text-transform:uppercase;letter-spacing:.05em}
+.pi{flex:1}
+.ptitle{font-size:15px;font-weight:700;margin-bottom:3px}
+.psub{font-size:12px;color:var(--ink2);line-height:1.4}
+.psub b{color:var(--or)}
+.cel{display:none;margin:0 1.25rem;background:var(--gn2);border:1.5px solid var(--gn3);border-radius:var(--r);padding:1rem;text-align:center}
+.cel.on{display:block}
+.cel-e{font-size:28px;margin-bottom:6px}
+.cel-t{font-family:'Fraunces',serif;font-size:17px;color:var(--gn)}
+.tabs-w{padding:1rem 1.25rem 0;overflow-x:auto}
+.tabs-w::-webkit-scrollbar{display:none}
+.tabs{display:flex;gap:6px;width:max-content}
+.tab{padding:7px 14px;border-radius:20px;font-size:12px;font-weight:700;cursor:pointer;border:1.5px solid var(--bdr);background:#fff;color:var(--ink2);transition:all .15s}
+.tab.active{background:var(--ink);color:#fff;border-color:var(--ink)}
+.sec{display:none;padding:1rem 1.25rem;animation:fi .18s ease}
+.sec.active{display:block}
+@keyframes fi{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+.sl{font-size:10px;font-weight:700;color:var(--ink3);text-transform:uppercase;letter-spacing:.09em;margin-bottom:8px;margin-top:4px}
+.task{background:#fff;border:1.5px solid var(--bdr);border-radius:var(--r);padding:.9rem 1rem;margin-bottom:7px;display:flex;align-items:flex-start;gap:10px;cursor:pointer;transition:all .15s;position:relative;overflow:hidden}
+.task::after{content:'';position:absolute;left:0;top:0;bottom:0;width:3px}
+.task.cl::after{background:var(--or)}.task.cr::after{background:var(--tl)}.task.cb::after{background:var(--vi)}
+.task.dn{background:var(--bg2);border-color:var(--bg3)}
+.task.dn .tt{text-decoration:line-through;color:var(--ink3)}
+.task:not(.dn):hover{transform:translateY(-1px);box-shadow:0 4px 14px rgba(0,0,0,.07)}
+.chk{width:22px;height:22px;border-radius:50%;border:2px solid var(--bdr);flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;transition:all .18s;background:#fff}
+.chk.on{background:var(--gn);border-color:var(--gn)}
+.chk svg{opacity:0;transform:scale(0);transition:all .15s}
+.chk.on svg{opacity:1;transform:scale(1)}
+.tb{flex:1}
+.tt{font-size:13px;font-weight:700;margin-bottom:3px}
+.tm{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--ink3)}
+.dt{background:var(--bg2);border-radius:20px;padding:2px 7px;font-weight:600;color:var(--ink2)}
+.card{background:#fff;border:1.5px solid var(--bdr);border-radius:var(--r);padding:1rem;margin-bottom:8px;transition:all .15s}
+.card:hover{border-color:var(--or3);box-shadow:0 3px 12px rgba(249,115,22,.07)}
+.ct{display:flex;gap:10px;align-items:flex-start}
+.ci{width:38px;height:38px;border-radius:9px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:17px}
+.ci.bk{background:var(--or2)}.ci.co{background:var(--tl2)}.ci.la{background:var(--vi2)}.ci.re{background:var(--am2)}
+.cb2{flex:1;min-width:0}
+.cn{font-size:13px;font-weight:700;margin-bottom:2px;line-height:1.3}
+.cs{font-size:11px;color:var(--ink3);margin-bottom:5px}
+.bdg{display:inline-flex;font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;text-transform:uppercase;letter-spacing:.03em}
+.b-reading{background:var(--tl2);color:var(--tl)}.b-done,.b-completed{background:var(--gn2);color:var(--gn)}.b-queued{background:var(--bg3);color:var(--ink3)}.b-progress{background:var(--am2);color:var(--am)}.b-active{background:var(--vi2);color:var(--vi)}
+.pb{margin-top:8px}
+.pbr{display:flex;justify-content:space-between;margin-bottom:3px;font-size:11px}
+.pbl{color:var(--ink3)}.pbp{font-weight:700;color:var(--or)}
+.pbt{height:4px;background:var(--bg3);border-radius:2px;overflow:hidden}
+.pbf{height:100%;border-radius:2px;background:linear-gradient(90deg,#f97316,#fb923c);transition:width .5s}
+.cn2{margin-top:8px;padding:7px 9px;background:var(--bg);border-radius:7px;font-size:11px;color:var(--ink2);line-height:1.4;border-left:2px solid var(--or3)}
+.cf{display:flex;justify-content:flex-end;gap:5px;margin-top:8px;padding-top:8px;border-top:1px solid var(--bdr)}
+.mn{font-size:11px;padding:4px 10px;border:1px solid var(--bdr);border-radius:20px;cursor:pointer;background:none;color:var(--ink2);font-family:'Plus Jakarta Sans',sans-serif;font-weight:600;transition:all .12s}
+.mn:hover{background:var(--bg2)}.mn.dl:hover{color:#e11d48;background:#fff1f2;border-color:#fecdd3}.mn.lk{color:var(--tl);border-color:var(--tl3)}
+.addb{width:100%;padding:11px;border:1.5px dashed var(--bdr);border-radius:var(--r);background:none;color:var(--ink3);font-size:13px;font-weight:700;font-family:'Plus Jakarta Sans',sans-serif;cursor:pointer;transition:all .15s;margin-bottom:8px;display:flex;align-items:center;justify-content:center;gap:6px}
+.addb:hover{border-color:var(--or);color:var(--or);background:var(--or2)}
+.sb{background:#fff;border:1.5px solid var(--bdr);border-radius:var(--r);overflow:hidden;margin-bottom:8px}
+.ss{font-size:10px;font-weight:700;color:var(--ink3);text-transform:uppercase;letter-spacing:.08em;padding:.9rem 1rem;border-bottom:1px solid var(--bdr)}
+.sr{display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:.9rem 1rem;border-bottom:1px solid var(--bdr)}
+.sr:last-child{border-bottom:none}
+.sl2{font-size:13px;font-weight:600}.sd{font-size:11px;color:var(--ink3);margin-top:1px}
+.sbtn{padding:7px 14px;border:1.5px solid var(--bdr);border-radius:20px;font-size:12px;font-weight:700;font-family:'Plus Jakarta Sans',sans-serif;cursor:pointer;background:#fff;color:var(--ink2);transition:all .12s;white-space:nowrap}
+.sbtn:hover{background:var(--bg2)}.sbtn.p{background:var(--or);color:#fff;border-color:var(--or)}.sbtn.p:hover{opacity:.88}.sbtn.d{color:#e11d48;border-color:transparent}.sbtn.d:hover{background:#fff1f2;border-color:#fecdd3}
+.stg{display:grid;grid-template-columns:1fr 1fr;gap:7px;padding:.9rem 1rem}
+.sm{background:var(--bg);border:1px solid var(--bdr);border-radius:7px;padding:9px 11px;display:flex;justify-content:space-between;align-items:center}
+.sml{font-size:11px;color:var(--ink3)}.smv{font-size:17px;font-family:'Fraunces',serif}
+.ov{display:none;position:fixed;inset:0;background:rgba(26,23,20,.55);z-index:200;align-items:flex-end;justify-content:center;backdrop-filter:blur(4px)}
+.ov.on{display:flex}
+.mo{background:#fff;border-radius:20px 20px 0 0;padding:1.5rem;width:100%;max-width:440px;max-height:90vh;overflow-y:auto;animation:mu .22s cubic-bezier(.4,0,.2,1)}
+@keyframes mu{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
+.mh{width:34px;height:4px;background:var(--bg3);border-radius:2px;margin:0 auto 1.2rem}
+.mt{font-family:'Fraunces',serif;font-size:20px;font-weight:300;margin-bottom:1.2rem}
+.fd{margin-bottom:11px}
+.fd label{display:block;font-size:10px;font-weight:700;color:var(--ink2);margin-bottom:4px;text-transform:uppercase;letter-spacing:.07em}
+.fd input,.fd select,.fd textarea{width:100%;padding:10px 13px;font-size:13px;border:1.5px solid var(--bdr);border-radius:var(--rs);background:var(--bg);color:var(--ink);font-family:'Plus Jakarta Sans',sans-serif;outline:none;transition:border-color .15s}
+.fd input:focus,.fd select:focus,.fd textarea:focus{border-color:var(--or);background:#fff}
+.fd textarea{min-height:68px;resize:vertical;line-height:1.5}
+.fr{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.rw{display:flex;align-items:center;gap:9px}
+.rw input[type=range]{flex:1;accent-color:var(--or)}
+.rv{font-size:13px;font-weight:700;min-width:30px;color:var(--or)}
+.mft{display:flex;gap:8px;margin-top:1.2rem}
+.msk{flex:1;padding:12px;background:var(--or);color:#fff;border:none;border-radius:var(--rs);font-size:13px;font-weight:700;font-family:'Plus Jakarta Sans',sans-serif;cursor:pointer}
+.msk:hover{opacity:.88}
+.mca{padding:12px 16px;border:1.5px solid var(--bdr);border-radius:var(--rs);font-size:13px;font-weight:600;font-family:'Plus Jakarta Sans',sans-serif;cursor:pointer;background:none;color:var(--ink2)}
+.tst{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;padding:9px 18px;border-radius:20px;font-size:11px;font-weight:700;z-index:999;opacity:0;transition:opacity .2s;pointer-events:none}
+.tst.on{opacity:1}
+.fi{display:none}
+</style>
+</head>
+<body>
+<div class="w">
+<div class="hdr">
+  <div class="hdr-top">
+    <div>
+      <div class="greeting" id="greet">Good morning, <em>MRA</em></div>
+      <div class="hdr-date" id="hdate"></div>
+    </div>
+    <div class="av">MR</div>
+  </div>
+</div>
+<div class="pc">
+  <div class="ring">
+    <svg width="68" height="68" viewBox="0 0 68 68">
+      <circle class="rbg" cx="34" cy="34" r="27"/>
+      <circle class="rf" id="rf" cx="34" cy="34" r="27" stroke-dasharray="169.6" stroke-dashoffset="169.6"/>
+    </svg>
+    <div class="ri">
+      <div class="rpct" id="rpct">0%</div>
+      <div class="rlbl">Done</div>
+    </div>
+  </div>
+  <div class="pi">
+    <div class="ptitle" id="ptit">Today's Plan</div>
+    <div class="psub" id="psub">Start your day, MRA.</div>
+  </div>
+</div>
+<div style="padding:0 1.25rem">
+  <div class="cel" id="cel">
+    <div class="cel-e">🎉</div>
+    <div class="cel-t">All done today! Outstanding.</div>
+  </div>
+</div>
+<div class="tabs-w">
+  <div class="tabs">
+    <div class="tab active" onclick="sw('today')">Today</div>
+    <div class="tab" onclick="sw('books')">Books</div>
+    <div class="tab" onclick="sw('courses')">Courses</div>
+    <div class="tab" onclick="sw('resources')">Resources</div>
+    <div class="tab" onclick="sw('lang')">Language</div>
+    <div class="tab" onclick="sw('settings')">Settings</div>
+  </div>
+</div>
+<div id="today" class="sec active"></div>
+<div id="books" class="sec"></div>
+<div id="courses" class="sec"></div>
+<div id="resources" class="sec"></div>
+<div id="lang" class="sec"></div>
+<div id="settings" class="sec"></div>
+</div>
+<div class="ov" id="ov">
+  <div class="mo">
+    <div class="mh"></div>
+    <div class="mt" id="mt"></div>
+    <div id="mf"></div>
+    <div class="mft">
+      <button class="mca" onclick="clsM()">Cancel</button>
+      <button class="msk" onclick="savM()">Save</button>
+    </div>
+  </div>
+</div>
+<div class="tst" id="tst"></div>
+<input type="file" class="fi" id="fi" accept=".json" onchange="impD(event)">
+<script>
+var SD={books:[{id:'b1',title:'Ogilvy on Advertising',author:'David Ogilvy',lang:'English',status:'done',progress:100,note:'Classic — the foundation of advertising.'},{id:'b2',title:'This Is Marketing',author:'Seth Godin',lang:'Persian',status:'reading',progress:0,note:'Month 1 — Amookhte translation.'},{id:'b3',title:'Purple Cow',author:'Seth Godin',lang:'Persian',status:'queued',progress:0,note:'Month 2 — standing out in a crowded market'},{id:'b4',title:'Positioning: The Battle for Your Mind',author:'Al Ries & Jack Trout',lang:'Persian',status:'queued',progress:0,note:'Month 2 — foundation of brand strategy'},{id:'b5',title:'Influence',author:'Robert Cialdini',lang:'Persian',status:'queued',progress:0,note:'Month 3 — consumer psychology'},{id:'b6',title:'Building a StoryBrand',author:'Donald Miller',lang:'Persian',status:'queued',progress:0,note:'Month 4 — brand narrative'},{id:'b7',title:'Contagious',author:'Jonah Berger',lang:'Persian',status:'queued',progress:0,note:'Month 5 — why things spread'},{id:'b8',title:'Good Strategy Bad Strategy',author:'Richard Rumelt',lang:'English',status:'queued',progress:0,note:'Month 6 — strategic thinking for CEOs'},{id:'b9',title:'Thinking, Fast and Slow',author:'Daniel Kahneman',lang:'Persian',status:'queued',progress:0,note:'Month 7 — decision psychology'},{id:'b10',title:'Creativity, Inc.',author:'Ed Catmull',lang:'Persian',status:'queued',progress:0,note:'Month 8 — creative culture from Pixar'},{id:'b11',title:'Obviously Awesome',author:'April Dunford',lang:'English',status:'queued',progress:0,note:'Month 9 — positioning'},{id:'b12',title:'The Advice Trap',author:'Michael Bungay Stanier',lang:'English',status:'queued',progress:0,note:'Month 10 — be an advisor not executor'},{id:'b13',title:'Predictably Irrational',author:'Dan Ariely',lang:'Persian',status:'queued',progress:0,note:'Month 11 — irrational consumer behavior'},{id:'b14',title:'Building a Second Brain',author:'Tiago Forte',lang:'English',status:'queued',progress:0,note:'Month 12 — knowledge management'},{id:'b15',title:'Meditations',author:'Marcus Aurelius',lang:'Persian',status:'queued',progress:0,note:'Parallel reading — mental clarity as a leader'}],courses:[{id:'c1',title:'HubSpot Content Marketing Certification',platform:'HubSpot Academy',cert:true,status:'queued',progress:0,note:'Free — Priority #1'},{id:'c2',title:'HubSpot Social Media Certification',platform:'HubSpot Academy',cert:true,status:'queued',progress:0,note:'Free — run in parallel'},{id:'c3',title:'LinkedIn Marketing Labs',platform:'LinkedIn',cert:true,status:'queued',progress:0,note:'Free — shows on profile'},{id:'c4',title:'Google Ads Certification',platform:'Google Skillshop',cert:true,status:'queued',progress:0,note:'Free — direct from Google'},{id:'c5',title:'Brand Strategy',platform:'CXL Institute',cert:true,status:'queued',progress:0,note:'1-month subscription'},{id:'c6',title:'Digital Psychology & Persuasion',platform:'CXL Institute',cert:true,status:'queued',progress:0,note:'Same month as Brand Strategy'},{id:'c7',title:'Content Marketing',platform:'CXL Institute',cert:true,status:'queued',progress:0,note:'3 CXL courses in one month'},{id:'c8',title:'Brand Strategy Course',platform:'Brand Master Academy',cert:true,status:'queued',progress:0,note:'Single course — Month 6-12'},{id:'c9',title:'CIM Digital Marketing Certificate',platform:'CIM',cert:true,status:'queued',progress:0,note:'Most credible UK marketing credential'},{id:'c10',title:'Advanced Certificate in Brand Strategy',platform:'Kellogg Executive Education',cert:true,status:'queued',progress:0,note:'Year 2 — global credibility'}],content:[{id:'ct1',title:"Seth Godin's Blog",cat:'Article',platform:'seths.blog',url:'https://seths.blog',note:'Daily'},{id:'ct2',title:'LinkedIn Feed',cat:'Article',platform:'LinkedIn',url:'https://linkedin.com',note:'Daily — engage with thought leaders'},{id:'ct3',title:'Motamem.org',cat:'Article',platform:'motamem.org',url:'https://motamem.org',note:'Weekly'},{id:'ct4',title:'Marketing Week',cat:'Article',platform:'marketingweek.com',url:'https://www.marketingweek.com',note:'Weekly'},{id:'ct5',title:'Campaign Magazine',cat:'Article',platform:'campaignlive.com',url:'https://www.campaignlive.com',note:'Weekly'},{id:'ct6',title:'WARC',cat:'Report',platform:'warc.com',url:'https://www.warc.com',note:'Weekly — case studies'},{id:'ct7',title:'Kantar BrandZ Reports',cat:'Report',platform:'Kantar',url:'https://www.kantar.com/campaigns/brandz',note:'Monthly'},{id:'ct8',title:'Dentsu Global Ad Spend',cat:'Report',platform:'Dentsu',url:'https://www.dentsu.com',note:'Monthly'},{id:'ct9',title:'Nielsen Marketing Report',cat:'Report',platform:'Nielsen',url:'https://www.nielsen.com/insights',note:'Monthly'},{id:'ct10',title:'Think with Google',cat:'Article',platform:'thinkwithgoogle.com',url:'https://www.thinkwithgoogle.com',note:'Monthly'}],lang:[{id:'l1',title:'American English File',skill:'Speaking',level:'B2',url:'',status:'active',note:'Sun & Tue 10:30-12:00 | Thu 10:00-11:30'},{id:'l2',title:'iTalki — Native Speaker',skill:'Speaking',level:'C1',url:'https://www.italki.com',status:'queued',note:'45 min/week — Business English'},{id:'l3',title:'Marketing School Podcast',skill:'Listening',level:'B2',url:'https://marketingschool.io',status:'queued',note:'Daily 10 min'},{id:'l4',title:'How I Built This',skill:'Listening',level:'B2',url:'https://www.npr.org/series/how-i-built-this',status:'queued',note:'Weekly'},{id:'l5',title:'Grammarly',skill:'Writing',level:'C1',url:'https://www.grammarly.com',status:'queued',note:'Use for all English writing'},{id:'l6',title:'LinkedIn Posts in English',skill:'Writing',level:'B2',url:'',status:'queued',note:'1 per 4-5 Persian posts'}],checks:{},lastDay:''};
+
+var KEY='mra_v5';
+var D=JSON.parse(JSON.stringify(SD));
+var cur='today',eId=null,eType=null;
+
+function load(){
+  try{var r=localStorage.getItem(KEY);if(r){var p=JSON.parse(r);D=Object.assign(JSON.parse(JSON.stringify(SD)),p);}}catch(e){}
+  var td=new Date().toDateString();
+  if(D.lastDay!==td){D.checks={};D.lastDay=td;svD();}
+  var d=new Date();
+  var days=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  var mos=['January','February','March','April','May','June','July','August','September','October','November','December'];
+  document.getElementById('hdate').textContent=days[d.getDay()]+', '+mos[d.getMonth()]+' '+d.getDate();
+  var h=d.getHours();
+  var gr=h<12?'Good morning':h<17?'Good afternoon':'Good evening';
+  document.getElementById('greet').innerHTML=gr+', <em>MRA</em>';
+  render();
+}
+
+function svD(){try{localStorage.setItem(KEY,JSON.stringify(D));}catch(e){}}
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,5);}
+function tst2(m){var t=document.getElementById('tst');t.textContent=m;t.classList.add('on');setTimeout(function(){t.classList.remove('on');},2000);}
+
+function getTasks(){
+  var dy=new Date().getDay();
+  var isCls=dy===0||dy===2||dy===4;
+  var T=[];
+  if(isCls)T.push({id:'lang-class',icon:'🌍',t:'Language Class',d:'American English File — online',dur:'60-90 min',cat:'l'});
+  T.push({id:'book-read',icon:'📖',t:'Book Reading',d:'This Is Marketing — current book',dur:isCls?'30 min':'60 min',cat:'l'});
+  T.push({id:'resources',icon:'📰',t:'Read Daily Resources',d:"Seth Godin's Blog + Motamem",dur:'30 min',cat:'r'});
+  T.push({id:'li-post',icon:'✍️',t:'LinkedIn Content',d:'Write or plan your next post',dur:'30 min',cat:'b'});
+  T.push({id:'li-engage',icon:'💬',t:'LinkedIn Engagement',d:'Comment on 3-5 thought leader posts',dur:'20 min',cat:'b'});
+  T.push({id:'connections',icon:'🤝',t:'New Connections',d:'5-10 targeted: marketers, CMOs, agency leads',dur:'10 min',cat:'b'});
+  if(dy===1)T.push({id:'analytics',icon:'📊',t:'Weekly Analytics Review',d:'What performed? What drove engagement?',dur:'20 min',cat:'b'});
+  return T;
+}
+
+function updRing(){
+  var tasks=getTasks();
+  var tot=tasks.length;
+  var done=0;
+  for(var i=0;i<tasks.length;i++){if(D.checks[tasks[i].id])done++;}
+  var pct=tot?Math.round(done/tot*100):0;
+  var C=169.6,off=C-(C*pct/100);
+  document.getElementById('rf').style.strokeDashoffset=off;
+  document.getElementById('rpct').textContent=pct+'%';
+  document.getElementById('ptit').textContent=pct===100?'All done! 🎉':"Today's Plan";
+  document.getElementById('psub').innerHTML=pct===100?'You crushed it today, MRA!':'<b>'+done+'/'+tot+'</b> tasks done';
+  document.getElementById('cel').classList.toggle('on',pct===100);
+}
+
+function rToday(){
+  var tasks=getTasks();
+  var cats=[['l','📚 Learning'],['r','📰 Reading'],['b','🎯 Personal Brand']];
+  var html='';
+  for(var ci=0;ci<cats.length;ci++){
+    var cat=cats[ci][0],lbl=cats[ci][1];
+    var ts=tasks.filter(function(t){return t.cat===cat;});
+    if(!ts.length)continue;
+    html+='<div class="sl" style="'+(ci>0?'margin-top:1rem':'')+'">'+lbl+'</div>';
+    for(var ti=0;ti<ts.length;ti++){
+      var t=ts[ti];
+      var on=D.checks[t.id]?true:false;
+      var catcls=cat==='l'?'cl':cat==='r'?'cr':'cb';
+      html+='<div class="task '+catcls+(on?' dn':'')+'" onclick="tog(\''+t.id+'\')">';
+      html+='<div class="chk'+(on?' on':'')+'" id="c-'+t.id+'"><svg width="11" height="11" viewBox="0 0 11 11" fill="none"><path d="M1.5 5.5l3 3 5-5" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>';
+      html+='<div class="tb"><div class="tt">'+t.icon+' '+t.t+'</div><div class="tm"><span class="dt">⏱ '+t.dur+'</span>'+t.d+'</div></div></div>';
+    }
+  }
+  document.getElementById('today').innerHTML=html;
+  updRing();
+}
+
+function tog(id){D.checks[id]=!D.checks[id];svD();rToday();}
+
+function bdg(s){
+  var m={reading:'Reading',done:'Done ✓',queued:'Queued',progress:'In Progress',completed:'Done ✓',active:'Active'};
+  return '<span class="bdg b-'+s+'">'+(m[s]||s)+'</span>';
+}
+
+function rBooks(){
+  var h='<button class="addb" onclick="opM(\'books\')">+ Add Book</button>';
+  var items=D.books||[];
+  for(var i=0;i<items.length;i++){
+    var x=items[i];
+    var sp=x.status==='reading';
+    var p=x.status==='done'?100:(x.progress||0);
+    h+='<div class="card"><div class="ct"><div class="ci bk">📖</div><div class="cb2"><div class="cn">'+x.title+'</div><div class="cs">'+x.author+' · '+x.lang+'</div>'+bdg(x.status)+'</div></div>';
+    if(sp||x.status==='done')h+='<div class="pb"><div class="pbr"><span class="pbl">Progress</span><span class="pbp">'+p+'%</span></div><div class="pbt"><div class="pbf" style="width:'+p+'%"></div></div></div>';
+    if(x.note)h+='<div class="cn2">'+x.note+'</div>';
+    h+='<div class="cf"><button class="mn" onclick="opM(\'books\',\''+x.id+'\')">Edit</button><button class="mn dl" onclick="delI(\'books\',\''+x.id+'\')">Delete</button></div></div>';
+  }
+  document.getElementById('books').innerHTML=h;
+}
+
+function rCourses(){
+  var h='<button class="addb" onclick="opM(\'courses\')">+ Add Course</button>';
+  var items=D.courses||[];
+  for(var i=0;i<items.length;i++){
+    var x=items[i];
+    var sp=x.status==='progress';
+    var p=x.progress||0;
+    var st=x.status==='completed'?'done':x.status;
+    h+='<div class="card"><div class="ct"><div class="ci co">🎓</div><div class="cb2"><div class="cn">'+x.title+'</div><div class="cs">'+x.platform+(x.cert?' · Certificate':'')+'</div>'+bdg(st)+'</div></div>';
+    if(sp)h+='<div class="pb"><div class="pbr"><span class="pbl">Progress</span><span class="pbp">'+p+'%</span></div><div class="pbt"><div class="pbf" style="width:'+p+'%"></div></div></div>';
+    if(x.note)h+='<div class="cn2">'+x.note+'</div>';
+    h+='<div class="cf"><button class="mn" onclick="opM(\'courses\',\''+x.id+'\')">Edit</button><button class="mn dl" onclick="delI(\'courses\',\''+x.id+'\')">Delete</button></div></div>';
+  }
+  document.getElementById('courses').innerHTML=h;
+}
+
+function rResources(){
+  var ico={Article:'📄',Report:'📊',Podcast:'🎙️',Video:'▶️'};
+  var h='<button class="addb" onclick="opM(\'content\')">+ Add Resource</button>';
+  var items=D.content||[];
+  for(var i=0;i<items.length;i++){
+    var x=items[i];
+    h+='<div class="card"><div class="ct"><div class="ci re">'+(ico[x.cat]||'🔗')+'</div><div class="cb2"><div class="cn">'+x.title+'</div><div class="cs">'+x.platform+'</div>';
+    if(x.note)h+='<div style="font-size:11px;color:var(--ink3);margin-top:2px">'+x.note+'</div>';
+    h+='</div></div><div class="cf">';
+    if(x.url)h+='<button class="mn lk" onclick="ol(\''+x.url+'\')">Open ↗</button>';
+    h+='<button class="mn dl" onclick="delI(\'content\',\''+x.id+'\')">Delete</button></div></div>';
+  }
+  document.getElementById('resources').innerHTML=h;
+}
+
+function rLang(){
+  var h='<button class="addb" onclick="opM(\'lang\')">+ Add Resource</button>';
+  var items=D.lang||[];
+  for(var i=0;i<items.length;i++){
+    var x=items[i];
+    h+='<div class="card"><div class="ct"><div class="ci la">🗣️</div><div class="cb2"><div class="cn">'+x.title+'</div><div class="cs">'+x.skill+' · Level '+x.level+'</div>'+bdg(x.status);
+    if(x.note)h+='<div style="font-size:11px;color:var(--ink3);margin-top:4px">'+x.note+'</div>';
+    h+='</div></div><div class="cf">';
+    if(x.url)h+='<button class="mn lk" onclick="ol(\''+x.url+'\')">Open ↗</button>';
+    h+='<button class="mn" onclick="opM(\'lang\',\''+x.id+'\')">Edit</button><button class="mn dl" onclick="delI(\'lang\',\''+x.id+'\')">Delete</button></div></div>';
+  }
+  document.getElementById('lang').innerHTML=h;
+}
+
+function rSettings(){
+  var tot=(D.books||[]).length+(D.courses||[]).length+(D.content||[]).length+(D.lang||[]).length;
+  var done=(D.books||[]).filter(function(x){return x.status==='done';}).length+(D.courses||[]).filter(function(x){return x.status==='completed';}).length;
+  document.getElementById('settings').innerHTML='<div class="sb"><div class="ss">Overview</div><div class="stg"><div class="sm"><span class="sml">Total Items</span><span class="smv">'+tot+'</span></div><div class="sm"><span class="sml">Completed</span><span class="smv">'+done+'</span></div><div class="sm"><span class="sml">Books</span><span class="smv">'+((D.books||[]).length)+'</span></div><div class="sm"><span class="sml">Courses</span><span class="smv">'+((D.courses||[]).length)+'</span></div></div></div><div class="sb"><div class="ss">Export</div><div class="sr"><div><div class="sl2">Download JSON</div><div class="sd">Backup all data</div></div><button class="sbtn p" onclick="expJ()">Download</button></div><div class="sr"><div><div class="sl2">Copy JSON</div><div class="sd">Clipboard backup</div></div><button class="sbtn" onclick="cpJ()">Copy</button></div></div><div class="sb"><div class="ss">Import</div><div class="sr"><div><div class="sl2">Load from JSON</div><div class="sd">Restore backup</div></div><button class="sbtn" onclick="document.getElementById(\'fi\').click()">Choose File</button></div></div><div class="sb"><div class="ss">Danger Zone</div><div class="sr"><div><div class="sl2">Reset Data</div><div class="sd">Restore original seed</div></div><button class="sbtn d" onclick="rst()">Reset</button></div></div>';
+}
+
+function expJ(){var b=new Blob([JSON.stringify(D,null,2)],{type:'application/json'});var a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='mra-'+new Date().toISOString().slice(0,10)+'.json';a.click();tst2('Downloaded ✓');}
+function cpJ(){navigator.clipboard.writeText(JSON.stringify(D,null,2)).then(function(){tst2('Copied ✓');}).catch(function(){tst2('Failed');});}
+function impD(e){var f=e.target.files[0];if(!f)return;var r=new FileReader();r.onload=function(ev){try{var p=JSON.parse(ev.target.result);if(typeof p==='object'){if(confirm('Replace current data?')){D=Object.assign(JSON.parse(JSON.stringify(SD)),p);svD();render();tst2('Imported ✓');}}}catch(err){tst2('Error reading file');}e.target.value='';};r.readAsText(f);}
+function rst(){if(confirm('Reset to original data?')){D=JSON.parse(JSON.stringify(SD));D.lastDay=new Date().toDateString();svD();render();tst2('Reset ✓');}}
+
+function opM(type,id){
+  eId=id||null;eType=type;
+  var map={books:D.books,courses:D.courses,content:D.content,lang:D.lang};
+  var x=id?(map[type]||[]).filter(function(i){return i.id===id;})[0]:null;
+  var tls={books:'Book',courses:'Course',content:'Resource',lang:'Language Resource'};
+  document.getElementById('mt').textContent=(id?'Edit ':'Add ')+tls[type];
+  var f='';
+  if(type==='books'){f='<div class="fd"><label>Title</label><input id="f0" value="'+(x?x.title:'')+'" placeholder="Book title"></div><div class="fr"><div class="fd"><label>Author</label><input id="f1" value="'+(x?x.author:'')+'" placeholder="Author"></div><div class="fd"><label>Language</label><select id="f2"><option value="Persian" '+(!x||x.lang==='Persian'?'selected':'')+'>Persian</option><option value="English" '+(x&&x.lang==='English'?'selected':'')+'>English</option></select></div></div><div class="fd"><label>Status</label><select id="f3"><option value="queued" '+(!x||x.status==='queued'?'selected':'')+'>Queued</option><option value="reading" '+(x&&x.status==='reading'?'selected':'')+'>Reading</option><option value="done" '+(x&&x.status==='done'?'selected':'')+'>Done</option></select></div><div class="fd"><label>Progress</label><div class="rw"><input type="range" id="f4" min="0" max="100" step="5" value="'+(x?x.progress||0:0)+'" oninput="document.getElementById(\'rv\').textContent=this.value+\'%\'"><span class="rv" id="rv">'+(x?x.progress||0:0)+'%</span></div></div><div class="fd"><label>Notes</label><textarea id="f5" placeholder="What did you learn?">'+(x?x.note||'':'')+'</textarea></div>';}
+  else if(type==='courses'){f='<div class="fd"><label>Title</label><input id="f0" value="'+(x?x.title:'')+'" placeholder="Course name"></div><div class="fr"><div class="fd"><label>Platform</label><input id="f1" value="'+(x?x.platform:'')+'" placeholder="HubSpot, CXL..."></div><div class="fd"><label>Certificate</label><select id="f2"><option value="">No</option><option value="yes" '+(x&&x.cert?'selected':'')+'>Yes</option></select></div></div><div class="fd"><label>Status</label><select id="f3"><option value="queued" '+(!x||x.status==='queued'?'selected':'')+'>Queued</option><option value="progress" '+(x&&x.status==='progress'?'selected':'')+'>In Progress</option><option value="completed" '+(x&&x.status==='completed'?'selected':'')+'>Completed</option></select></div><div class="fd"><label>Progress</label><div class="rw"><input type="range" id="f4" min="0" max="100" step="5" value="'+(x?x.progress||0:0)+'" oninput="document.getElementById(\'rv\').textContent=this.value+\'%\'"><span class="rv" id="rv">'+(x?x.progress||0:0)+'%</span></div></div><div class="fd"><label>Notes</label><textarea id="f5" placeholder="Notes...">'+(x?x.note||'':'')+'</textarea></div>';}
+  else if(type==='content'){f='<div class="fd"><label>Title</label><input id="f0" value="'+(x?x.title:'')+'" placeholder="Resource title"></div><div class="fr"><div class="fd"><label>Category</label><select id="f1"><option value="Article">Article</option><option value="Report">Report</option><option value="Podcast">Podcast</option><option value="Video">Video</option></select></div><div class="fd"><label>Platform</label><input id="f2" value="'+(x?x.platform:'')+'" placeholder="Platform"></div></div><div class="fd"><label>URL</label><input id="f3" value="'+(x?x.url||'':'')+'" placeholder="https://..."></div><div class="fd"><label>Notes</label><textarea id="f5" placeholder="Why important?">'+(x?x.note||'':'')+'</textarea></div>';}
+  else if(type==='lang'){f='<div class="fd"><label>Title</label><input id="f0" value="'+(x?x.title:'')+'" placeholder="Resource name"></div><div class="fr"><div class="fd"><label>Skill</label><select id="f1"><option value="Speaking" '+(x&&x.skill==='Speaking'?'selected':'')+'>Speaking</option><option value="Listening" '+(x&&x.skill==='Listening'?'selected':'')+'>Listening</option><option value="Writing" '+(x&&x.skill==='Writing'?'selected':'')+'>Writing</option><option value="Vocabulary">Vocabulary</option></select></div><div class="fd"><label>Level</label><select id="f2"><option value="B2" '+(x&&x.level==='B2'?'selected':'')+'>B2</option><option value="C1" '+(x&&x.level==='C1'?'selected':'')+'>C1</option></select></div></div><div class="fd"><label>URL</label><input id="f3" value="'+(x?x.url||'':'')+'" placeholder="https://..."></div><div class="fd"><label>Status</label><select id="f4"><option value="queued" '+(!x||x.status==='queued'?'selected':'')+'>Queued</option><option value="active" '+(x&&x.status==='active'?'selected':'')+'>Active</option><option value="done" '+(x&&x.status==='done'?'selected':'')+'>Done</option></select></div><div class="fd"><label>Notes</label><textarea id="f5" placeholder="Tips?">'+(x?x.note||'':'')+'</textarea></div>';}
+  document.getElementById('mf').innerHTML=f;
+  document.getElementById('ov').classList.add('on');
+}
+
+function clsM(){document.getElementById('ov').classList.remove('on');eId=null;eType=null;}
+
+function savM(){
+  var type=eType;
+  var title=document.getElementById('f0')?document.getElementById('f0').value.trim():'';
+  if(!title)return;
+  var b={id:eId||uid(),title:title};
+  function g(n){var el=document.getElementById(n);return el?el.value:'';}
+  if(type==='books'){b.author=g('f1');b.lang=g('f2')||'Persian';b.status=g('f3')||'queued';b.progress=parseInt(g('f4'))||0;b.note=g('f5');}
+  else if(type==='courses'){b.platform=g('f1');b.cert=g('f2')==='yes';b.status=g('f3')||'queued';b.progress=parseInt(g('f4'))||0;b.note=g('f5');}
+  else if(type==='content'){b.cat=g('f1')||'Article';b.platform=g('f2');b.url=g('f3');b.note=g('f5');}
+  else if(type==='lang'){b.skill=g('f1')||'Listening';b.level=g('f2')||'B2';b.url=g('f3');b.status=g('f4')||'queued';b.note=g('f5');}
+  if(!D[type])D[type]=[];
+  if(eId){for(var i=0;i<D[type].length;i++){if(D[type][i].id===eId){D[type][i]=b;break;}}}
+  else{D[type].push(b);}
+  svD();clsM();render();tst2('Saved ✓');
+}
+
+function delI(type,id){
+  if(!confirm('Delete?'))return;
+  D[type]=D[type].filter(function(x){return x.id!==id;});
+  svD();render();tst2('Deleted');
+}
+
+function ol(u){if(u)window.open(u,'_blank');}
+
+document.getElementById('ov').addEventListener('click',function(e){if(e.target===this)clsM();});
+
+function sw(tab){
+  cur=tab;
+  var tabs=document.querySelectorAll('.tab');
+  var names=['today','books','courses','resources','lang','settings'];
+  for(var i=0;i<tabs.length;i++){tabs[i].classList.toggle('active',names[i]===tab);}
+  var secs=document.querySelectorAll('.sec');
+  for(var i=0;i<secs.length;i++){secs[i].classList.remove('active');}
+  document.getElementById(tab).classList.add('active');
+  render();
+}
+
+function render(){
+  if(cur==='today')rToday();
+  else if(cur==='books')rBooks();
+  else if(cur==='courses')rCourses();
+  else if(cur==='resources')rResources();
+  else if(cur==='lang')rLang();
+  else if(cur==='settings')rSettings();
+}
+
+load();
+</script>
+</body>
+</html>

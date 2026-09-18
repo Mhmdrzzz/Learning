@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#F4F4EF">
+<title>مسیر</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;800&family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&display=swap">
+<style>
+  :root{
+    --ground:#F4F4EF;
+    --paper:#FFFFFF;
+    --ink:#15160F;
+    --mid:#66685C;
+    --faint:#9C9E91;
+    --rule:#DFE0D7;
+    --rule-soft:#EAEBE3;
+    --accent:#3D5B36;
+    --accent-soft:#E2EBDC;
+    --accent-ink:#2E4728;
+    --wait:#F0E7CC;
+    --wait-ink:#6A5A24;
+    --miss:#E8E3DC;
+    --shadow:0 1px 2px rgba(21,22,15,.04), 0 8px 24px -12px rgba(21,22,15,.12);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --ground:#0E0F0A; --paper:#171810; --ink:#F0F0E6; --mid:#989A8C; --faint:#6A6C60;
+      --rule:#2A2C22; --rule-soft:#212318; --accent:#8FB183; --accent-soft:#222C1E;
+      --accent-ink:#B9D0AF; --wait:#2E2A18; --wait-ink:#D5C68C; --miss:#232419;
+      --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -12px rgba(0,0,0,.6);
+    }
+  }
+  :root[data-theme="dark"]{
+    --ground:#0E0F0A; --paper:#171810; --ink:#F0F0E6; --mid:#989A8C; --faint:#6A6C60;
+    --rule:#2A2C22; --rule-soft:#212318; --accent:#8FB183; --accent-soft:#222C1E;
+    --accent-ink:#B9D0AF; --wait:#2E2A18; --wait-ink:#D5C68C; --miss:#232419;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -12px rgba(0,0,0,.6);
+  }
+
+  *{box-sizing:border-box}
+  body{
+    background:var(--ground); color:var(--ink);
+    font-family:"Vazirmatn",system-ui,sans-serif; line-height:1.75;
+    -webkit-font-smoothing:antialiased;
+  }
+  .num{
+    font-family:"Bricolage Grotesque","Vazirmatn",system-ui,sans-serif;
+    font-variant-numeric:tabular-nums; font-weight:800; letter-spacing:-.03em;
+  }
+  .lat{font-family:"Bricolage Grotesque",system-ui,sans-serif;direction:ltr;display:inline-block}
+
+  .wrap{
+    direction:rtl; max-width:600px; margin:0 auto;
+    padding-inline:20px; padding-block:34px 72px;
+    display:flex; flex-direction:column; gap:34px;
+  }
+
+  .mast{display:flex;align-items:baseline;justify-content:space-between;gap:16px;flex-wrap:wrap}
+  .mark{
+    font-family:"Bricolage Grotesque",system-ui,sans-serif; direction:ltr;
+    font-size:10.5px; font-weight:600; letter-spacing:.3em; color:var(--faint);
+  }
+  .datechip{font-size:12px;color:var(--faint)}
+  h1{font-size:23px;font-weight:600;margin:10px 0 0;letter-spacing:-.01em;text-wrap:balance}
+
+  .hero{
+    background:var(--paper); border:1px solid var(--rule); border-radius:2px;
+    box-shadow:var(--shadow); padding:26px 24px 22px;
+    display:flex; align-items:flex-end; gap:20px; flex-wrap:wrap;
+  }
+  .hero .big{font-size:76px;line-height:.82;color:var(--accent)}
+  .hero .bigwrap{display:flex;flex-direction:column;gap:6px}
+  .hero .cap{font-size:12.5px;color:var(--mid)}
+  .hero .side{margin-inline-start:auto;text-align:left;display:flex;gap:22px}
+  .stat .n{font-size:22px;display:block;line-height:1.2}
+  .stat .l{font-size:11.5px;color:var(--faint);display:block}
+
+  .today{
+    background:var(--paper); border:1px solid var(--rule); border-radius:2px;
+    box-shadow:var(--shadow); overflow:hidden;
+  }
+  .today .body{padding:22px 24px}
+  .today.is-done{background:var(--accent-soft);border-color:transparent;box-shadow:none}
+  .eyebrow{
+    font-family:"Bricolage Grotesque",system-ui,sans-serif;
+    font-size:10px;font-weight:600;letter-spacing:.24em;text-transform:uppercase;
+    color:var(--faint);direction:ltr;text-align:right;
+  }
+  .today h2{font-size:17px;font-weight:600;margin:10px 0 3px}
+  .today p.why{color:var(--mid);font-size:13px;margin:0;line-height:1.75}
+  .today.is-done h2,.today.is-done p.why{color:var(--accent-ink)}
+
+  .pickrow{
+    margin-top:18px; border:1px solid var(--rule-soft); border-radius:2px;
+    background:var(--ground); display:flex; align-items:center; gap:12px; padding:12px 14px;
+  }
+  .today.is-done .pickrow{background:transparent;border-color:transparent}
+  .pickrow .who{flex:1;min-width:0}
+  .pickrow .who a{color:inherit;font-size:14.5px;font-weight:500;text-decoration:none}
+  .pickrow .who a:hover{text-decoration:underline}
+  .pickrow .who .meta{display:block;font-size:11.5px;color:var(--faint)}
+  .swap{
+    flex:0 0 auto;background:none;border:1px solid var(--rule);color:var(--mid);
+    font-family:inherit;font-size:12px;padding:6px 11px;border-radius:2px;cursor:pointer;
+  }
+  .swap:hover{color:var(--ink);border-color:var(--mid)}
+
+  button.tick{
+    display:block;width:100%;font-family:inherit;font-size:15px;font-weight:600;
+    color:#FFF;background:var(--accent);border:none;border-top:1px solid transparent;
+    padding:15px 16px;cursor:pointer;transition:filter .15s;
+  }
+  .today.is-done button.tick{
+    background:transparent;color:var(--accent-ink);
+    border-top:1px solid rgba(61,91,54,.25);font-weight:500;
+  }
+  button.tick:hover{filter:brightness(1.08)}
+  button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+  .cal{display:grid;grid-template-columns:repeat(7,1fr);gap:5px}
+  .dow{font-size:10.5px;color:var(--faint);text-align:center;padding-bottom:2px}
+  .cell{
+    aspect-ratio:1;border-radius:2px;background:var(--rule-soft);position:relative;
+  }
+  .cell.mot{box-shadow:inset 0 0 0 1.5px var(--rule)}
+  .cell.past{background:var(--miss)}
+  .cell.done{background:var(--accent);box-shadow:none}
+  .cell.today{background:var(--wait);box-shadow:inset 0 0 0 2px var(--wait-ink)}
+  .cell.today.done{background:var(--accent);box-shadow:inset 0 0 0 2px var(--accent-ink)}
+  .cell.milestone::after{
+    content:"";position:absolute;inset:auto auto 4px 50%;transform:translateX(50%);
+    width:4px;height:4px;border-radius:50%;background:var(--wait-ink);
+  }
+  .cell.milestone.done::after{background:rgba(255,255,255,.85)}
+  .callegend{display:flex;gap:16px;flex-wrap:wrap;font-size:11.5px;color:var(--faint);margin-top:14px}
+  .callegend i{width:9px;height:9px;border-radius:2px;display:inline-block;margin-inline-end:5px;vertical-align:-1px}
+
+  .gatebar{
+    margin-top:16px;padding-top:14px;border-top:1px solid var(--rule-soft);
+    display:flex;justify-content:space-between;align-items:baseline;font-size:12.5px;color:var(--mid);
+  }
+  .gatebar .n{font-size:15px;color:var(--ink)}
+
+  ul{list-style:none;margin:0;padding:0}
+  .checks li{
+    display:flex;align-items:flex-start;gap:12px;padding:14px 0;
+    border-bottom:1px solid var(--rule-soft);font-size:14px;
+  }
+  .checks li:last-child{border-bottom:none}
+  .checks .txt{flex:1;cursor:pointer}
+  .checks .meta{display:block;font-size:11.5px;color:var(--faint);margin-top:1px}
+  .pill{font-size:11px;padding:3px 10px;border-radius:999px;white-space:nowrap;background:var(--wait);color:var(--wait-ink)}
+  .pill.ok{background:var(--accent-soft);color:var(--accent-ink)}
+  .box{
+    appearance:none;width:19px;height:19px;flex:0 0 19px;margin-top:5px;
+    border:1.5px solid var(--faint);border-radius:2px;background:transparent;
+    cursor:pointer;position:relative;
+  }
+  .box:checked{background:var(--accent);border-color:var(--accent)}
+  .box:checked::after{
+    content:"";position:absolute;inset:4px;
+    border-inline-start:2px solid #FFF;border-block-end:2px solid #FFF;
+    transform:rotate(-45deg) translate(1px,-1px);
+  }
+
+  .lessons{border-top:1px solid var(--rule-soft)}
+  .lessons li{
+    display:flex;gap:11px;align-items:baseline;padding:8px 0;
+    border-bottom:1px solid var(--rule-soft);font-size:13.5px;
+  }
+  .lessons li .i{
+    font-family:"Bricolage Grotesque",system-ui,sans-serif;font-size:11px;
+    color:var(--faint);flex:0 0 22px;font-variant-numeric:tabular-nums;
+  }
+  .lessons li.seen{color:var(--faint)}
+  .lessons li.now{background:var(--wait);margin-inline:-8px;padding-inline:8px;border-radius:2px}
+  .lessons li.now .i{color:var(--wait-ink)}
+
+  .sources li{border-bottom:1px solid var(--rule-soft)}
+  .sources li:last-child{border-bottom:none}
+  .sources a{display:flex;align-items:baseline;gap:11px;padding:11px 0;color:var(--ink);text-decoration:none;font-size:14px}
+  .sources a:hover .name{text-decoration:underline}
+  .sources .layer{
+    font-family:"Bricolage Grotesque",system-ui,sans-serif;font-size:9.5px;font-weight:600;
+    letter-spacing:.1em;color:var(--faint);flex:0 0 42px;
+  }
+  .sources .name{flex:1}
+  .sources .note{font-size:11.5px;color:var(--faint)}
+
+  .rules{font-size:13px;color:var(--mid);line-height:1.95}
+  .rules p{margin:0 0 6px}
+  .rules strong{color:var(--ink);font-weight:600}
+
+  h3.sect{font-size:14px;font-weight:600;margin:0 0 14px}
+  details>summary{cursor:pointer;font-size:12.5px;color:var(--mid);margin-top:10px;list-style:none}
+  details>summary::-webkit-details-marker{display:none}
+  details>summary::before{content:"▾ ";color:var(--faint)}
+  details[open]>summary::before{content:"▴ "}
+
+  @media (max-width:420px){
+    .hero .big{font-size:60px}
+    .hero .side{margin-inline-start:0;width:100%;justify-content:space-between}
+  }
+  @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body style="margin:0">
+
+
+<div class="wrap">
+
+  <header>
+    <div class="mast">
+      <span class="mark">LAMANA</span>
+      <span class="datechip" id="todayLabel">—</span>
+    </div>
+    <h1>مسیر یادگیری و برند شخصی</h1>
+  </header>
+
+  <section class="hero">
+    <div class="bigwrap">
+      <span class="big num" id="streakN">0</span>
+      <span class="cap" id="streakCap">روز پیاپی</span>
+    </div>
+    <div class="side">
+      <div class="stat"><span class="n num" id="totalN">0</span><span class="l">مجموع</span></div>
+      <div class="stat"><span class="n num" id="leftN">0</span><span class="l">تا دروازه</span></div>
+    </div>
+  </section>
+
+  <section class="today" id="today">
+    <div class="body">
+      <div class="eyebrow" id="dayKind">TODAY</div>
+      <h2 id="todayTitle">کار امروز</h2>
+      <p class="why" id="todayWhy">—</p>
+      <div class="pickrow">
+        <div class="who">
+          <a id="pickLink" href="#" target="_blank" rel="noopener">—</a>
+          <span class="meta" id="pickMeta">—</span>
+        </div>
+        <button class="swap" id="swapBtn" type="button">منبع دیگر</button>
+      </div>
+    </div>
+    <button class="tick" id="tickBtn" type="button">امروز انجام شد</button>
+  </section>
+
+  <section>
+    <h3 class="sect">هفتاد روز تا دروازه</h3>
+    <div class="cal" id="dowRow"></div>
+    <div class="cal" id="cal" style="margin-top:5px"></div>
+    <div class="callegend">
+      <span><i style="background:var(--accent)"></i>انجام‌شده</span>
+      <span><i style="background:var(--wait);box-shadow:inset 0 0 0 1.5px var(--wait-ink)"></i>امروز</span>
+      <span><i style="background:var(--miss)"></i>جاافتاده</span>
+      <span><i style="background:var(--rule-soft);box-shadow:inset 0 0 0 1.5px var(--rule)"></i>روز متمم</span>
+      <span><i style="background:var(--wait-ink);border-radius:50%"></i>سررسید</span>
+    </div>
+    <div class="gatebar">
+      <span>دروازه — شنبه ۷ آذر ۱۴۰۵</span>
+      <span><span class="n num" id="pctN">0</span>٪ مسیر</span>
+    </div>
+  </section>
+
+  <section>
+    <h3 class="sect">تفکر نقادانه — <span id="motProgress">۰ از ۲۵</span></h3>
+    <details id="lessonsBox">
+      <summary>دیدن کل ترتیب درس‌ها</summary>
+      <ul class="lessons" id="lessonList"></ul>
+    </details>
+  </section>
+
+  <section>
+    <h3 class="sect">شرط‌های دروازه</h3>
+    <ul class="checks">
+      <li>
+        <input class="box" type="checkbox" id="chk-book">
+        <label class="txt" for="chk-book">کتاب <span class="lat">How Brands Grow</span> تمام شده
+          <span class="meta">خرید تا دوشنبه ۳۰ شهریور</span></label>
+        <span class="pill" id="pill-book">در انتظار</span>
+      </li>
+      <li>
+        <input class="box" type="checkbox" id="chk-a1">
+        <label class="txt" for="chk-a1">مقاله اول منتشر شده
+          <span class="meta">۹ آبان — تحقیق جن‌زی خاورمیانه، موگوموگو</span></label>
+        <span class="pill" id="pill-a1">در انتظار</span>
+      </li>
+      <li>
+        <input class="box" type="checkbox" id="chk-a2">
+        <label class="txt" for="chk-a2">مقاله دوم منتشر شده
+          <span class="meta">۷ آذر — از سند استراتژی بعدی</span></label>
+        <span class="pill" id="pill-a2">در انتظار</span>
+      </li>
+    </ul>
+  </section>
+
+  <section>
+    <h3 class="sect">منابع بین‌المللی</h3>
+    <ul class="sources" id="srcList"></ul>
+  </section>
+
+  <section class="rules">
+    <h3 class="sect">قواعد</h3>
+    <p><strong>روز متمم یعنی کامنت.</strong> خواندن بدون کامنت، تیک ندارد.</p>
+    <p><strong>هیچ‌وقت دو روز پشت سر هم متمم.</strong> بیست‌وپنج روز متمم، چهل‌وپنج روز بین‌المللی.</p>
+    <p><strong>روز جاافتاده مشکلی نیست.</strong> هفتهٔ جاافتاده یعنی برگرد، نه یعنی تمام شد.</p>
+    <p><strong>عقربه دو ماه اول تعداد منتشرشده است.</strong> نه لایک، نه کامنت.</p>
+    <p><strong>دو ماه پشت سر هم بدون مقاله</strong> یعنی شاهد انسانی اضافه می‌شود.</p>
+    <p><strong>وبلاگ، دوره و نسخه دوم اپ</strong> حذف نشده‌اند — شرط دارند.</p>
+  </section>
+
+</div>
+
+<script>
+(function(){
+  var KEY="masir.v3", START="2026-09-19", GATE="2026-11-28", WEEKS=10;
+  var MOT_URL="https://motamem.org/%D8%AA%D9%81%DA%A9%D8%B1-%D9%86%D9%82%D8%A7%D8%AF%D8%A7%D9%86%D9%87/";
+
+  var LESSONS=[
+    "تفکر نقادانه — معرفی درس",
+    "دانشمند بودن هم یک شغل است",
+    "تعریف تفکر نقادانه و تاریخچه نقد",
+    "کاربردهای تفکر نقادانه",
+    "کتاب راهنمای تفکر نقادانه",
+    "فکر کردن نقادانه شبیه خاکشویی است",
+    "چهار پایه اصلی تفکر نقادانه",
+    "خودمحوری و مانع تفکر نقادانه",
+    "روش و روش‌شناسی",
+    "روش علمی چیست",
+    "گشت‌وگذاری در تاریخ منطق",
+    "تعریف شناخت",
+    "تعریف تفکر",
+    "تعریف گزاره",
+    "گزاره‌های اثباتی در برابر هنجاری",
+    "استدلال و فرم استاندارد آن",
+    "روایت و ادعا در برابر بحث و استدلال",
+    "ادعا و ادعاشناسی",
+    "چتر مفهومی",
+    "کتاب واقع‌نگری — هانس روسلینگ",
+    "فیک نیوز",
+    "Fiskkit و نبرد با اخبار جعلی",
+    "شکاف‌های سیاسی و دوقطبی شدن",
+    "تجربهٔ ذهنی — ذخایر بستر دریاها",
+    "فیزیک و تکنولوژی برای رئیس‌جمهورهای آینده"
+  ];
+
+  var INTL=[
+    {n:"Ehrenberg-Bass Institute",u:"https://marketingscience.info",l:"FMCG",g:"لایه ۳"},
+    {n:"NielsenIQ",u:"https://nielseniq.com/global/en/insights/",l:"داده مصرف‌کننده",g:"لایه ۳"},
+    {n:"Kantar Worldpanel",u:"https://www.kantar.com/campaigns/africa-fmcg-consumer-panels",l:"پنل منطقه",g:"لایه ۳"},
+    {n:"Mark Ritson",u:"https://www.marketingweek.com/author/markritson/",l:"استراتژی برند",g:"لایه ۲"},
+    {n:"Ana Andjelic",u:"https://andjelicaaa.substack.com",l:"برند و فرهنگ",g:"لایه ۲"},
+    {n:"WARC",u:"https://www.warc.com",l:"اثربخشی",g:"لایه ۲"},
+    {n:"Campaign Middle East",u:"https://campaignme.com",l:"نبض منطقه",g:"لایه ۱"},
+    {n:"Communicate Online",u:"https://communicateonline.me",l:"نبض منطقه",g:"لایه ۱"},
+    {n:"BeautyMatter",u:"https://beautymatter.com",l:"بیوتی، حاشیه",g:"لایه ۳"}
+  ];
+
+  var MILESTONES={"2026-09-21":"کتاب","2026-10-31":"مقاله اول"};
+
+  // 70-day rhythm: alternating weeks of 3 and 2 Motamem days, never two in a row
+  function motDays(){
+    var a=[],w,d;
+    for(var i=0;i<WEEKS*7;i++){
+      w=Math.floor(i/7); d=i%7;
+      var set=(w%2===0)?[0,2,4]:[1,4];
+      a.push(set.indexOf(d)!==-1);
+    }
+    return a;
+  }
+  var MOT=motDays();
+
+  var state={days:[],book:false,a1:false,a2:false,offset:0,offsetDay:""};
+
+  function load(){
+    try{
+      var raw=localStorage.getItem(KEY);
+      if(raw){var p=JSON.parse(raw);
+        if(p&&typeof p==="object"){
+          state.days=Array.isArray(p.days)?p.days:[];
+          state.book=!!p.book;state.a1=!!p.a1;state.a2=!!p.a2;
+          state.offset=+p.offset||0;state.offsetDay=p.offsetDay||"";
+        }}
+    }catch(e){}
+  }
+  function save(){try{localStorage.setItem(KEY,JSON.stringify(state));}catch(e){}}
+
+  function iso(d){return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");}
+  function today(){return iso(new Date());}
+  function parse(s){var p=s.split("-");return new Date(+p[0],+p[1]-1,+p[2]);}
+  function shift(s,n){var d=parse(s);d.setDate(d.getDate()+n);return iso(d);}
+  function diff(a,b){
+    var pa=a.split("-"),pb=b.split("-");
+    return Math.round((Date.UTC(+pb[0],+pb[1]-1,+pb[2])-Date.UTC(+pa[0],+pa[1]-1,+pa[2]))/86400000);
+  }
+
+  var doneSet={};
+  function rebuild(){doneSet={};for(var i=0;i<state.days.length;i++)doneSet[state.days[i]]=true;}
+
+  function streak(){
+    var c=today();
+    if(!doneSet[c])c=shift(c,-1);
+    var n=0;
+    while(doneSet[c]){n++;c=shift(c,-1);}
+    return n;
+  }
+
+  function dayIndex(d){return diff(START,d);}
+  function isMot(d){var i=dayIndex(d);return i>=0&&i<MOT.length&&MOT[i];}
+  function lessonNo(d){
+    var i=dayIndex(d),n=0;
+    for(var k=0;k<=i&&k<MOT.length;k++) if(MOT[k]) n++;
+    return n;
+  }
+
+  function intlPick(d,off){
+    var i=dayIndex(d), seen=0;
+    for(var k=0;k<i&&k<MOT.length;k++) if(!MOT[k]) seen++;
+    var j=seen+off;
+    return INTL[((j%INTL.length)+INTL.length)%INTL.length];
+  }
+
+  var $=function(id){return document.getElementById(id);};
+  var fa=function(n){return String(n).replace(/\d/g,function(c){return "۰۱۲۳۴۵۶۷۸۹"[c];});};
+
+  function buildStatic(){
+    var dows=["ش","ی","د","س","چ","پ","ج"],h="";
+    for(var i=0;i<7;i++)h+='<div class="dow">'+dows[i]+'</div>';
+    $("dowRow").innerHTML=h;
+
+    var s="";
+    for(var j=0;j<WEEKS*7;j++){
+      var d=shift(START,j);
+      s+='<div class="cell" data-d="'+d+'" data-i="'+j+'"></div>';
+    }
+    $("cal").innerHTML=s;
+
+    var l="";
+    for(var k=0;k<INTL.length;k++){
+      l+='<li><a href="'+INTL[k].u+'" target="_blank" rel="noopener"><span class="layer">'+INTL[k].g+
+         '</span><span class="name">'+INTL[k].n+'</span><span class="note">'+INTL[k].l+'</span></a></li>';
+    }
+    $("srcList").innerHTML=l;
+
+    var m="";
+    for(var q=0;q<LESSONS.length;q++){
+      m+='<li data-n="'+(q+1)+'"><span class="i">'+fa(q+1)+'</span><span>'+LESSONS[q]+'</span></li>';
+    }
+    $("lessonList").innerHTML=m;
+  }
+
+  function render(){
+    rebuild();
+    var t=today(), done=!!doneSet[t], idx=dayIndex(t), started=idx>=0;
+
+    $("todayLabel").textContent=new Date().toLocaleDateString("fa-IR",{weekday:"long",day:"numeric",month:"long"});
+
+    $("today").classList.toggle("is-done",done);
+
+    var mot=isMot(t), no=mot?lessonNo(t):0;
+
+    if(!started){
+      $("dayKind").textContent="START";
+      $("todayTitle").textContent="شروع شنبه ۲۸ شهریور";
+      $("todayWhy").textContent="تا آن روز کاری لازم نیست. فقط کتاب How Brands Grow را سفارش بده.";
+      $("pickLink").textContent="—"; $("pickLink").removeAttribute("href");
+      $("pickMeta").textContent="هنوز شروع نشده";
+      $("swapBtn").hidden=true;
+    } else if(mot){
+      $("dayKind").textContent="MOTAMEM";
+      $("todayTitle").textContent=done?"کامنت امروز نوشته شد":"درس "+fa(no)+" از ۲۵";
+      $("todayWhy").textContent="درس را بخوان و زیرش کامنت بگذار. تیک امروز مشروط به کامنت است، نه خواندن. نوشته‌ات دیده می‌شود و امتیاز می‌گیرد — این تنها جایی است که نوشتنت شاهد دارد.";
+      $("pickLink").textContent=LESSONS[Math.min(no,LESSONS.length)-1]||"—";
+      $("pickLink").href=MOT_URL;
+      $("pickMeta").textContent="متمم — تفکر نقادانه";
+      $("swapBtn").hidden=true;
+    } else {
+      if(state.offsetDay!==t){state.offset=0;state.offsetDay=t;}
+      var pick=intlPick(t,state.offset);
+      $("dayKind").textContent="INTERNATIONAL";
+      $("todayTitle").textContent=done?"امروز انجام شد":"کار امروز";
+      $("todayWhy").textContent="بخوان و سه چهار خط واکنش بنویس. موافقم چون — مخالفم چون — اینجا جواب نمی‌دهد چون. حداقل بیست دقیقه، سقف یک ساعت.";
+      $("pickLink").textContent=pick.n; $("pickLink").href=pick.u;
+      $("pickMeta").textContent=pick.g+" — "+pick.l;
+      $("swapBtn").hidden=false;
+    }
+
+    $("tickBtn").textContent=done?"لغو تیک امروز":(mot&&started?"کامنت گذاشتم":"امروز انجام شد");
+
+    var st=streak();
+    $("streakN").textContent=fa(st);
+    $("streakCap").textContent=st===0?"هنوز شروع نشده":"روز پیاپی";
+    $("totalN").textContent=fa(state.days.length);
+    var left=diff(t,GATE);
+    $("leftN").textContent=fa(left>0?left:0);
+
+    var span=diff(START,GATE), gone=diff(START,t);
+    $("pctN").textContent=fa(Math.max(0,Math.min(100,Math.round(gone/span*100))));
+
+    // lessons done = motamem days already ticked
+    var motDone=0;
+    for(var i=0;i<MOT.length;i++){
+      if(MOT[i] && doneSet[shift(START,i)]) motDone++;
+    }
+    $("motProgress").textContent=fa(motDone)+" از ۲۵";
+
+    var lis=$("lessonList").children;
+    for(var q=0;q<lis.length;q++){
+      lis[q].className="";
+      if(q<motDone) lis[q].classList.add("seen");
+      if(mot && q===no-1) lis[q].classList.add("now");
+    }
+
+    var cells=$("cal").children;
+    for(var c=0;c<cells.length;c++){
+      var el=cells[c], d=el.getAttribute("data-d"), cmp=diff(d,t);
+      el.className="cell"+(MOT[c]?" mot":"")+(MILESTONES[d]?" milestone":"");
+      if(doneSet[d]) el.classList.add("done");
+      else if(cmp>0) el.classList.add("past");
+      if(cmp===0) el.classList.add("today");
+      el.title=(MOT[c]?"متمم":"منبع بین‌المللی");
+    }
+
+    ["book","a1","a2"].forEach(function(k){
+      $("chk-"+k).checked=state[k];
+      var p=$("pill-"+k);
+      p.textContent=state[k]?"انجام شد":"در انتظار";
+      p.classList.toggle("ok",state[k]);
+    });
+  }
+
+  $("tickBtn").addEventListener("click",function(){
+    var t=today(), i=state.days.indexOf(t);
+    if(i===-1)state.days.push(t);else state.days.splice(i,1);
+    save();render();
+  });
+  $("swapBtn").addEventListener("click",function(){
+    state.offsetDay=today();
+    state.offset=(state.offset+1)%INTL.length;
+    save();render();
+  });
+  ["book","a1","a2"].forEach(function(k){
+    $("chk-"+k).addEventListener("change",function(){state[k]=$("chk-"+k).checked;save();render();});
+  });
+
+  load();buildStatic();render();
+})();
+</script>
+
+</body>
+</html>

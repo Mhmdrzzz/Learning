@@ -1,0 +1,916 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0B0A09">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>مسیر</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800&family=Instrument+Serif:ital@0;1&display=swap">
+<style>
+  :root{
+    color-scheme: dark;
+    --void:#0B0A09;
+    --ground:#121110;
+    --line:#2C2927;
+    --line-soft:#201E1C;
+    --ivory:#EDE8E1;
+    --mute:#9C948C;
+    --faint:#6B635C;
+    --gold:#A33B46;
+    --gold-dim:#5E2229;
+    --pist:#C8B49A;
+    --pist-dim:#4A3F33;
+    --rose:#B06A4E;
+  }
+
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    background:
+      radial-gradient(120% 70% at 50% -10%, #241A1B 0%, transparent 62%),
+      var(--ground);
+    background-attachment:fixed;
+    color:var(--ivory);
+    font-family:"Vazirmatn",system-ui,sans-serif;
+    line-height:1.75;
+    -webkit-font-smoothing:antialiased;
+    margin:0;
+  }
+
+  .serif{font-family:"Instrument Serif",Georgia,serif;font-weight:400;direction:ltr;display:inline-block}
+  .tnum{font-variant-numeric:tabular-nums}
+
+  .app{
+    direction:rtl;
+    max-width:620px;
+    margin:0 auto;
+    padding-inline:20px;
+    padding-block:28px 112px;
+    min-height:100%;
+  }
+
+  /* ---------- masthead ---------- */
+  .mast{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:22px}
+  .brand{display:flex;align-items:center;gap:10px}
+  .brand .dot{width:7px;height:7px;border-radius:50%;background:var(--gold);box-shadow:0 0 14px var(--gold)}
+  .brand span{
+    font-size:10.5px;letter-spacing:.34em;color:var(--mute);direction:ltr;font-weight:600;
+  }
+  .daychip{
+    font-size:11.5px;color:var(--mute);border:1px solid var(--line);
+    padding:5px 11px;border-radius:999px;background:#1A1817;
+  }
+
+  /* ---------- views ---------- */
+  .view{display:none;animation:rise .45s cubic-bezier(.2,.7,.3,1) both}
+  .view.on{display:block}
+  @keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+
+  /* ---------- ring ---------- */
+  .ringwrap{position:relative;display:flex;justify-content:center;margin:6px 0 26px}
+  .ring{width:236px;height:236px;display:block}
+  .ring circle{fill:none;stroke-linecap:round}
+  .ring .track{stroke:var(--line-soft);stroke-width:10}
+  .ring .prog{
+    stroke:url(#goldgrad);stroke-width:10;
+    filter:drop-shadow(0 0 10px rgba(163,59,70,.40));
+    transition:stroke-dashoffset 1.1s cubic-bezier(.2,.8,.2,1);
+  }
+  .ringmid{
+    position:absolute;inset:0;display:flex;flex-direction:column;
+    align-items:center;justify-content:center;gap:2px;pointer-events:none;
+  }
+  .ringmid .n{font-size:76px;line-height:.85;color:var(--gold);letter-spacing:-.02em}
+  .ringmid .l{font-size:12.5px;color:var(--mute)}
+  .ringmid .sub{font-size:11px;color:var(--faint);margin-top:6px}
+
+  .trio{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:26px}
+  .trio div{
+    background:#1A1817;border:1px solid var(--line-soft);border-radius:14px;
+    padding:13px 10px;text-align:center;
+  }
+  .trio .n{font-size:21px;color:var(--ivory);display:block;line-height:1.25}
+  .trio .l{font-size:11px;color:var(--faint);display:block}
+
+  /* ---------- task card ---------- */
+  .card{
+    background:linear-gradient(170deg,#1E1A19 0%,#141211 70%);
+    border:1px solid var(--line);border-radius:20px;overflow:hidden;
+    box-shadow:0 20px 50px -28px #000, inset 0 1px 0 #ffffff0d;
+  }
+  .card.done{
+    background:linear-gradient(170deg,#241E1A 0%,#161312 70%);
+    border-color:#4A3F33;
+  }
+  .card .pad{padding:22px 22px 20px}
+  .kicker{
+    display:inline-flex;align-items:center;gap:7px;
+    font-size:10px;letter-spacing:.22em;color:var(--gold);direction:ltr;font-weight:700;
+    border:1px solid var(--gold-dim);border-radius:999px;padding:4px 10px;
+  }
+  .card.done .kicker{color:var(--pist);border-color:var(--pist-dim)}
+  .card h2{font-size:20px;font-weight:700;margin:14px 0 6px;letter-spacing:-.01em;text-wrap:balance}
+  .card p.lead{color:var(--mute);font-size:13px;margin:0;line-height:1.8}
+
+  .item{
+    margin-top:18px;border:1px solid var(--line-soft);border-radius:14px;
+    background:#0E0D0C99;padding:15px 16px;
+  }
+  .item a.t{display:block;color:var(--ivory);font-size:15.5px;font-weight:600;text-decoration:none;line-height:1.6}
+  .item a.t:hover{color:var(--gold)}
+  .item .src{display:block;font-size:11.5px;color:var(--faint);margin-top:3px}
+  .item .lab{
+    display:block;font-size:10px;letter-spacing:.18em;color:var(--gold);
+    margin-top:15px;font-weight:700;
+  }
+  .item .bd{font-size:13px;color:var(--mute);margin:3px 0 0;line-height:1.8}
+  .item .none{font-size:13px;color:var(--faint);margin:0}
+
+  textarea{
+    width:100%;margin-top:16px;min-height:96px;resize:vertical;
+    font-family:inherit;font-size:13.5px;line-height:1.85;color:var(--ivory);
+    background:#0E0D0C;border:1px solid var(--line-soft);border-radius:14px;padding:13px 14px;
+  }
+  textarea::placeholder{color:#5A524B}
+  .saved{font-size:11px;color:var(--faint);margin-top:7px;min-height:15px}
+
+  button.big{
+    display:block;width:100%;border:none;cursor:pointer;
+    font-family:inherit;font-size:15.5px;font-weight:700;
+    padding:17px 16px;color:#F6F0EA;
+    background:linear-gradient(180deg,#B8444F,#8D2F3A);
+    transition:filter .18s, transform .08s;
+  }
+  button.big:hover{filter:brightness(1.07)}
+  button.big:active{transform:scale(.995)}
+  .card.done button.big{
+    background:transparent;color:var(--pist);
+    border-top:1px solid #4A3F33;font-weight:500;
+  }
+
+  /* ---------- calendar ---------- */
+  .cal{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+  .dow{font-size:10.5px;color:var(--faint);text-align:center}
+  .cell{
+    aspect-ratio:1;border-radius:7px;background:#1A1817;cursor:pointer;
+    position:relative;transition:transform .12s, background .2s, box-shadow .2s;
+  }
+  .cell:hover{transform:scale(1.12)}
+  .cell.mot{box-shadow:inset 0 0 0 1px var(--line)}
+  .cell.gone{background:#171514}
+  .cell.done{background:var(--pist);box-shadow:0 0 12px -2px #C8B49A4D}
+  .cell.now{background:var(--gold);box-shadow:0 0 16px -2px var(--gold)}
+  .cell.future{cursor:default}
+  .cell.mark::after{
+    content:"";position:absolute;inset:auto auto 4px 50%;transform:translateX(50%);
+    width:4px;height:4px;border-radius:50%;background:var(--gold);
+  }
+  .cell.done.mark::after,.cell.now.mark::after{background:#121110}
+
+  .legend{display:flex;gap:14px;flex-wrap:wrap;font-size:11px;color:var(--faint);margin-top:16px}
+  .legend i{width:9px;height:9px;border-radius:3px;display:inline-block;margin-inline-end:6px;vertical-align:-1px}
+
+  .milestones{margin-top:26px}
+  .ms{
+    display:flex;gap:14px;align-items:flex-start;padding:15px 0;
+    border-top:1px solid var(--line-soft);
+  }
+  .ms .when{font-size:11.5px;color:var(--gold);flex:0 0 74px;padding-top:2px}
+  .ms .what{flex:1;font-size:14px}
+  .ms .what span{display:block;font-size:11.5px;color:var(--faint);margin-top:2px}
+  .ms .state{font-size:10.5px;padding:3px 10px;border-radius:999px;border:1px solid var(--line);color:var(--mute);white-space:nowrap;height:fit-content}
+  .ms .state.ok{color:var(--pist);border-color:var(--pist-dim)}
+
+  /* ---------- lessons ---------- */
+  .lrow{
+    display:flex;gap:13px;align-items:center;padding:13px 0;
+    border-bottom:1px solid var(--line-soft);font-size:14px;
+  }
+  .lrow .i{
+    flex:0 0 30px;height:30px;border-radius:50%;display:grid;place-items:center;
+    font-size:11px;color:var(--faint);border:1px solid var(--line);
+  }
+  .lrow.done .i{background:var(--pist-dim);border-color:var(--pist-dim);color:var(--pist)}
+  .lrow.now{margin-inline:-12px;padding-inline:12px;border-radius:12px;background:#1F1B1A}
+  .lrow.now .i{border-color:var(--gold);color:var(--gold)}
+  .lrow.done .nm{color:var(--mute)}
+  .lrow .nm{flex:1;line-height:1.6}
+
+  .miss{
+    border:1px solid #4A322A;background:#1C1413;border-radius:16px;
+    padding:16px 17px;margin-bottom:22px;
+  }
+  .miss h4{margin:0 0 4px;font-size:14px;font-weight:700;color:var(--rose)}
+  .miss p{margin:0 0 12px;font-size:12.5px;color:var(--mute)}
+  .mrow{
+    display:flex;gap:11px;align-items:center;padding:10px 0;
+    border-top:1px solid #33241F;font-size:13.5px;
+  }
+  .mrow .mt{flex:1;line-height:1.55}
+  .mrow .mt small{display:block;color:var(--faint);font-size:11px}
+  .mini{
+    border:1px solid var(--line);background:transparent;color:var(--mute);
+    font-family:inherit;font-size:11.5px;padding:5px 11px;border-radius:999px;cursor:pointer;
+  }
+  .mini:hover{color:var(--ivory);border-color:var(--mute)}
+  .mini.go{border-color:var(--pist-dim);color:var(--pist)}
+
+  /* ---------- more ---------- */
+  .block{margin-bottom:28px}
+  h3.sec{
+    font-size:11px;letter-spacing:.2em;color:var(--faint);
+    margin:0 0 14px;font-weight:700;
+  }
+  .srow{border-bottom:1px solid var(--line-soft)}
+  .srow:last-child{border-bottom:none}
+  .srow a{display:flex;gap:12px;align-items:baseline;padding:12px 0;color:var(--ivory);text-decoration:none;font-size:14px}
+  .srow a:hover .nm{color:var(--gold)}
+  .srow .tag{font-size:9.5px;letter-spacing:.1em;color:var(--faint);flex:0 0 46px;direction:ltr;text-align:right}
+  .srow .nm{flex:1}
+  .srow .note{font-size:11px;color:var(--faint)}
+
+  .rules p{margin:0 0 9px;font-size:13px;color:var(--mute);line-height:1.85}
+  .rules b{color:var(--ivory);font-weight:600}
+
+  input[type=password],input[type=text]{
+    width:100%;margin-bottom:9px;font-family:"Instrument Serif",monospace;direction:ltr;
+    font-size:14px;padding:12px 13px;border:1px solid var(--line);border-radius:12px;
+    background:#0E0D0C;color:var(--ivory);
+  }
+  .msg{font-size:11.5px;color:var(--faint);margin:8px 0 0;min-height:16px}
+
+  button:focus-visible,a:focus-visible,textarea:focus-visible,input:focus-visible,.cell:focus-visible{
+    outline:2px solid var(--gold);outline-offset:3px
+  }
+
+  /* ---------- day sheet ---------- */
+  .scrim{
+    position:fixed;inset:0;background:#060505cc;backdrop-filter:blur(3px);
+    z-index:20;display:none;align-items:flex-end;justify-content:center;
+  }
+  .scrim.on{display:flex;animation:fade .2s both}
+  @keyframes fade{from{opacity:0}to{opacity:1}}
+  .sheet{
+    direction:rtl;width:100%;max-width:620px;
+    background:linear-gradient(180deg,#1E1A19,#100F0E);
+    border:1px solid var(--line);border-bottom:none;
+    border-radius:22px 22px 0 0;padding:20px 22px calc(26px + env(safe-area-inset-bottom,0px));
+    animation:up .3s cubic-bezier(.2,.8,.2,1) both;max-height:82vh;overflow:auto;
+  }
+  @keyframes up{from{transform:translateY(40px);opacity:.4}to{transform:none;opacity:1}}
+  .sheet .grip{width:38px;height:4px;border-radius:99px;background:var(--line);margin:0 auto 16px}
+  .sheet h3{margin:0 0 3px;font-size:17px;font-weight:700}
+  .sheet .sub{font-size:12px;color:var(--faint);margin:0 0 16px}
+  .sheet .row{display:flex;gap:9px;flex-wrap:wrap;margin-top:16px}
+  .sheet .big2{
+    flex:1;min-width:140px;border:none;border-radius:13px;padding:13px;cursor:pointer;
+    font-family:inherit;font-size:14px;font-weight:700;color:#F6F0EA;
+    background:linear-gradient(180deg,#B8444F,#8D2F3A);
+  }
+  .sheet .big2.off{background:none;border:1px solid var(--line);color:var(--mute);font-weight:500}
+  .sheet .note{font-size:13px;color:var(--mute);line-height:1.85;margin:0;
+    border-inline-start:2px solid var(--line);padding-inline-start:12px}
+
+  /* ---------- tab bar ---------- */
+  .tabs{
+    position:fixed;inset:auto 0 0 0;z-index:9;
+    background:#0B0A09F2;backdrop-filter:blur(14px);
+    border-top:1px solid var(--line-soft);
+    padding:9px 12px calc(9px + env(safe-area-inset-bottom,0px));
+    display:flex;justify-content:center;gap:4px;
+  }
+  .tabs .in{display:flex;gap:4px;max-width:620px;width:100%;direction:rtl}
+  .tab{
+    flex:1;background:none;border:none;cursor:pointer;color:var(--faint);
+    font-family:inherit;font-size:11.5px;padding:9px 4px 7px;border-radius:12px;
+    display:flex;flex-direction:column;align-items:center;gap:5px;transition:color .2s,background .2s;
+  }
+  .tab .ic{width:19px;height:19px;display:block}
+  .tab .ic path,.tab .ic circle,.tab .ic rect{stroke:currentColor;stroke-width:1.7;fill:none;stroke-linecap:round;stroke-linejoin:round}
+  .tab.on{color:var(--gold);background:#241F1E}
+  .tab .bdg{
+    position:absolute;transform:translate(14px,-4px);
+    width:7px;height:7px;border-radius:50%;background:var(--rose);
+  }
+  .tabwrap{position:relative;flex:1;display:flex}
+
+  @media (max-width:400px){ .ring{width:200px;height:200px} .ringmid .n{font-size:62px} }
+  @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+
+
+<div class="app">
+
+  <div class="mast">
+    <div class="brand"><i class="dot"></i><span>MOHAMMADREZA</span></div>
+    <div class="daychip" id="dchip">—</div>
+  </div>
+
+  <!-- ============ TODAY ============ -->
+  <section class="view on" id="v-today">
+    <div class="ringwrap">
+      <svg class="ring" viewBox="0 0 120 120" aria-hidden="true">
+        <defs>
+          <linearGradient id="goldgrad" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#C45260"/>
+            <stop offset="100%" stop-color="#7E2831"/>
+          </linearGradient>
+        </defs>
+        <circle class="track" cx="60" cy="60" r="52"/>
+        <circle class="prog" id="ring" cx="60" cy="60" r="52"
+                transform="rotate(-90 60 60)" stroke-dasharray="326.7" stroke-dashoffset="326.7"/>
+      </svg>
+      <div class="ringmid">
+        <span class="n serif tnum" id="streak">0</span>
+        <span class="l" id="streakLab">روز پیاپی</span>
+        <span class="sub" id="ringSub">—</span>
+      </div>
+    </div>
+
+    <div class="trio">
+      <div><span class="n serif tnum" id="total">0</span><span class="l">مجموع روز</span></div>
+      <div><span class="n serif tnum" id="motN">0</span><span class="l">درس متمم</span></div>
+      <div><span class="n serif tnum" id="left">0</span><span class="l">تا دروازه</span></div>
+    </div>
+
+    <div class="card" id="card">
+      <div class="pad">
+        <span class="kicker" id="kicker">TODAY</span>
+        <h2 id="title">کار امروز</h2>
+        <p class="lead" id="lead">—</p>
+
+        <div class="item">
+          <a class="t" id="pt" href="#" target="_blank" rel="noopener">—</a>
+          <span class="src" id="ps"></span>
+          <span class="lab" id="lw" hidden>چرا این یکی، برای تو</span>
+          <p class="bd" id="pw" hidden></p>
+          <span class="lab" id="lq" hidden>سوالی که نگه می‌داری</span>
+          <p class="bd" id="pq" hidden></p>
+          <p class="none" id="pn" hidden></p>
+        </div>
+
+        <textarea id="note" placeholder="واکنش امروز — موافقم چون… مخالفم چون… اینجا جواب نمی‌دهد چون…"></textarea>
+        <div class="saved" id="noteState"></div>
+      </div>
+      <button class="big" id="tick" type="button">امروز انجام شد</button>
+    </div>
+  </section>
+
+  <!-- ============ PATH ============ -->
+  <section class="view" id="v-path">
+    <h3 class="sec">هفتاد روز</h3>
+    <div class="cal" id="dows"></div>
+    <div class="cal" id="cal" style="margin-top:6px"></div>
+    <div class="legend">
+      <span><i style="background:var(--pist)"></i>انجام‌شده</span>
+      <span><i style="background:var(--gold)"></i>امروز</span>
+      <span><i style="background:#121A2B"></i>جاافتاده</span>
+      <span><i style="background:#1A1817;box-shadow:inset 0 0 0 1px var(--line)"></i>روز متمم</span>
+    </div>
+    <p class="msg">روی هر خانه بزنی، همان روز تیک می‌خورد یا برمی‌گردد.</p>
+
+    <div class="milestones">
+      <h3 class="sec" style="margin-top:28px">سررسیدها</h3>
+      <div class="ms">
+        <span class="when">۱۵ مهر</span>
+        <span class="what">کتاب How Brands Grow<span>شروع مطالعه — چهارشنبه</span></span>
+        <span class="state" id="st-book">در انتظار</span>
+      </div>
+      <div class="ms">
+        <span class="when">۲۳ آبان</span>
+        <span class="what">مقاله اول منتشر شد<span>از تحقیق جن‌زی خاورمیانه، موگوموگو</span></span>
+        <span class="state" id="st-a1">در انتظار</span>
+      </div>
+      <div class="ms">
+        <span class="when">۲۱ آذر</span>
+        <span class="what">مقاله دوم و ارزیابی دروازه<span>از سند استراتژی بعدی</span></span>
+        <span class="state" id="st-a2">در انتظار</span>
+      </div>
+      <p class="msg">برای تغییر وضعیت، روی هر سررسید بزن.</p>
+    </div>
+  </section>
+
+  <!-- ============ LESSONS ============ -->
+  <section class="view" id="v-lessons">
+    <div class="miss" id="missBox" hidden>
+      <h4>جامانده‌ها</h4>
+      <p>لازم نیست همه را جبران کنی. یکی را بردار یا ردشان کن و امروز را بزن.</p>
+      <div id="missRows"></div>
+    </div>
+
+    <h3 class="sec">تفکر نقادانه — <span id="lprog">۰ از ۲۵</span></h3>
+    <div id="lessons"></div>
+  </section>
+
+  <!-- ============ MORE ============ -->
+  <section class="view" id="v-more">
+    <div class="block">
+      <h3 class="sec">منابع بین‌المللی</h3>
+      <div id="srcs"></div>
+    </div>
+
+    <div class="block rules">
+      <h3 class="sec">قواعد</h3>
+      <p><b>روز متمم یعنی کامنت.</b> خواندن بدون کامنت، تیک ندارد.</p>
+      <p><b>هیچ‌وقت دو روز پشت سر هم متمم.</b> بیست‌وپنج روز متمم، چهل‌وپنج روز بین‌المللی.</p>
+      <p><b>روز جاافتاده مشکلی نیست.</b> هفتهٔ جاافتاده یعنی برگرد، نه یعنی تمام شد.</p>
+      <p><b>عقربه دو ماه اول تعداد منتشرشده است.</b> نه لایک، نه کامنت.</p>
+      <p><b>دو ماه پشت سر هم بدون مقاله</b> یعنی شاهد انسانی اضافه می‌شود.</p>
+      <p><b>وبلاگ، دوره و مجموعهٔ بعدی متمم</b> حذف نشده‌اند — شرط دارند.</p>
+    </div>
+
+    <div class="block">
+      <h3 class="sec">انتخاب خودکار مقاله</h3>
+      <p class="msg" style="margin-bottom:10px">کلید فقط در مرورگر خودت ذخیره می‌شود. روزی یک تماس، با جستجوی وب.</p>
+      <input id="ak" type="password" autocomplete="off" placeholder="sk-ant-…">
+      <input id="am" type="text" autocomplete="off" placeholder="claude-sonnet-4-5">
+      <div style="display:flex;gap:8px">
+        <button class="mini" id="akSave" type="button">ذخیره کلید</button>
+        <button class="mini go" id="akRun" type="button">انتخاب مقاله امروز</button>
+      </div>
+      <p class="msg" id="akMsg"></p>
+    </div>
+
+    <div class="block">
+      <h3 class="sec">خروجی گرفتن</h3>
+      <p class="msg" style="margin-bottom:10px">همه روزها، درس‌ها، مقاله‌ها و واکنش‌هایت در یک فایل.</p>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="mini" id="exCopy" type="button">کپی گزارش</button>
+        <button class="mini" id="exFile" type="button">دانلود فایل</button>
+      </div>
+      <p class="msg" id="exMsg"></p>
+    </div>
+
+    <div class="block">
+      <h3 class="sec">وضعیت</h3>
+      <p class="msg" id="sync">—</p>
+    </div>
+  </section>
+</div>
+
+<div class="scrim" id="scrim">
+  <div class="sheet" role="dialog" aria-modal="true">
+    <div class="grip"></div>
+    <h3 id="shTitle">—</h3>
+    <p class="sub" id="shSub">—</p>
+    <div class="item">
+      <a class="t" id="shLink" href="#" target="_blank" rel="noopener">—</a>
+      <span class="src" id="shSrc"></span>
+    </div>
+    <p class="note" id="shNote" hidden></p>
+    <div class="row">
+      <button class="big2" id="shTick" type="button">تیک بزن</button>
+      <button class="big2 off" id="shFind" type="button" hidden>مقاله آن روز را پیدا کن</button>
+      <button class="big2 off" id="shClose" type="button">بستن</button>
+    </div>
+  </div>
+</div>
+
+<nav class="tabs">
+  <div class="in">
+    <div class="tabwrap"><button class="tab on" data-v="today" type="button">
+      <svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>امروز</button></div>
+    <div class="tabwrap"><button class="tab" data-v="path" type="button">
+      <svg class="ic" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M8 3v4M16 3v4M3 11h18"/></svg>مسیر</button></div>
+    <div class="tabwrap"><button class="tab" data-v="lessons" type="button">
+      <svg class="ic" viewBox="0 0 24 24"><path d="M5 4h9l5 5v11H5z"/><path d="M14 4v5h5M9 13h6M9 17h4"/></svg>درس‌ها<i class="bdg" id="bdg" hidden></i></button></div>
+    <div class="tabwrap"><button class="tab" data-v="more" type="button">
+      <svg class="ic" viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.3"/><circle cx="12" cy="12" r="1.3"/><circle cx="19" cy="12" r="1.3"/></svg>بیشتر</button></div>
+  </div>
+</nav>
+
+<script>
+(function(){
+  var LS="masir.v4", START="2026-10-03", GATE="2026-12-12", WEEKS=10;
+  var MOT_URL="https://motamem.org/%D8%AA%D9%81%DA%A9%D8%B1-%D9%86%D9%82%D8%A7%D8%AF%D8%A7%D9%86%D9%87/";
+  var RING=2*Math.PI*52;
+
+  var LESSONS=["تفکر نقادانه — معرفی درس","دانشمند بودن هم یک شغل است","تعریف تفکر نقادانه و تاریخچه نقد",
+    "کاربردهای تفکر نقادانه","کتاب راهنمای تفکر نقادانه","فکر کردن نقادانه شبیه خاکشویی است",
+    "چهار پایه اصلی تفکر نقادانه","خودمحوری و مانع تفکر نقادانه","روش و روش‌شناسی","روش علمی چیست",
+    "گشت‌وگذاری در تاریخ منطق","تعریف شناخت","تعریف تفکر","تعریف گزاره","گزاره‌های اثباتی در برابر هنجاری",
+    "استدلال و فرم استاندارد آن","روایت و ادعا در برابر بحث و استدلال","ادعا و ادعاشناسی","چتر مفهومی",
+    "کتاب واقع‌نگری — هانس روسلینگ","فیک نیوز","Fiskkit و نبرد با اخبار جعلی",
+    "شکاف‌های سیاسی و دوقطبی شدن","تجربهٔ ذهنی — ذخایر بستر دریاها",
+    "فیزیک و تکنولوژی برای رئیس‌جمهورهای آینده"];
+
+  var INTL=[
+    {n:"Ehrenberg-Bass Institute",u:"https://marketingscience.info",l:"FMCG",g:"لایه ۳"},
+    {n:"NielsenIQ",u:"https://nielseniq.com/global/en/insights/",l:"داده مصرف‌کننده",g:"لایه ۳"},
+    {n:"Kantar Worldpanel",u:"https://www.kantar.com/campaigns/africa-fmcg-consumer-panels",l:"پنل منطقه",g:"لایه ۳"},
+    {n:"Mark Ritson",u:"https://www.marketingweek.com/author/markritson/",l:"استراتژی برند",g:"لایه ۲"},
+    {n:"Ana Andjelic",u:"https://andjelicaaa.substack.com",l:"برند و فرهنگ",g:"لایه ۲"},
+    {n:"WARC",u:"https://www.warc.com",l:"اثربخشی",g:"لایه ۲"},
+    {n:"Campaign Middle East",u:"https://campaignme.com",l:"نبض منطقه",g:"لایه ۱"},
+    {n:"Communicate Online",u:"https://communicateonline.me",l:"نبض منطقه",g:"لایه ۱"},
+    {n:"BeautyMatter",u:"https://beautymatter.com",l:"بیوتی، حاشیه",g:"لایه ۳"}
+  ];
+  var MARKS={"2026-10-07":1,"2026-11-14":1,"2026-12-12":1};
+
+  // از «خاکشویی» (درس ۶ ترتیب متمم) شروع می‌شود؛ نوبت‌های آخر مرور درس‌های ۱ تا ۵ است
+  var OFFSET=5;
+  var LINKS={"فکر کردن نقادانه شبیه خاکشویی است":
+    "https://motamem.org/%d9%81%da%a9%d8%b1-%da%a9%d8%b1%d8%af%d9%86-%d9%86%d9%82%d8%a7%d8%af%d8%a7%d9%86%d9%87/"};
+  function slotURL(k){
+    var n=slotName(k).replace(/^مرور — /,"");
+    return LINKS[n]||MOT_URL;
+  }
+  function slotName(k){                      // k از ۱ تا ۲۵
+    if(k<=LESSONS.length-OFFSET) return LESSONS[k+OFFSET-1];
+    var r=k-(LESSONS.length-OFFSET);         // ۱، ۲، ۳
+    return "مرور — "+LESSONS[r-1];
+  }
+
+  var MOT=(function(){var a=[];for(var i=0;i<WEEKS*7;i++){var w=Math.floor(i/7),d=i%7;
+    a.push(((w%2===0)?[0,2,4]:[1,4]).indexOf(d)!==-1);}return a;})();
+
+  var S={days:[],book:false,a1:false,a2:false};
+  var picks={}, db=null, booted=false;
+
+  function iso(d){return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");}
+  function today(){return iso(new Date());}
+  function parse(s){var p=s.split("-");return new Date(+p[0],+p[1]-1,+p[2]);}
+  function shift(s,n){var d=parse(s);d.setDate(d.getDate()+n);return iso(d);}
+  function diff(a,b){var x=a.split("-"),y=b.split("-");
+    return Math.round((Date.UTC(+y[0],+y[1]-1,+y[2])-Date.UTC(+x[0],+x[1]-1,+x[2]))/86400000);}
+  var $=function(i){return document.getElementById(i);};
+  var fa=function(n){return String(n).replace(/\d/g,function(c){return "۰۱۲۳۴۵۶۷۸۹"[c];});};
+  function faD(d){try{return parse(d).toLocaleDateString("fa-IR",{weekday:"long",day:"numeric",month:"long"});}catch(e){return d;}}
+
+  var done={};
+  function reindex(){done={};S.days.forEach(function(d){done[d]=1;});}
+  function streak(){var c=today();if(!done[c])c=shift(c,-1);var n=0;while(done[c]){n++;c=shift(c,-1);}return n;}
+  function idx(d){return diff(START,d);}
+  function isMot(d){var i=idx(d);return i>=0&&i<MOT.length&&MOT[i];}
+  function lessonNo(d){var i=idx(d),n=0;for(var k=0;k<=i&&k<MOT.length;k++)if(MOT[k])n++;return n;}
+  function fallback(d){var i=idx(d),s=0;for(var k=0;k<i&&k<MOT.length;k++)if(!MOT[k])s++;
+    return INTL[((s%INTL.length)+INTL.length)%INTL.length];}
+  function missed(){var t=today(),o=[];for(var i=0;i<MOT.length;i++){var d=shift(START,i);
+    if(diff(d,t)>0&&!done[d])o.push(d);}return o;}
+
+  function lsLoad(){try{var r=localStorage.getItem(LS);if(r){var p=JSON.parse(r);
+    if(p&&typeof p==="object"){S.days=Array.isArray(p.days)?p.days:[];S.book=!!p.book;S.a1=!!p.a1;S.a2=!!p.a2;}}}catch(e){}}
+  function lsSave(){try{localStorage.setItem(LS,JSON.stringify(S));}catch(e){}}
+  var busy=false,again=false;
+  function persist(){
+    lsSave(); if(!db) return;
+    if(busy){again=true;return;} busy=true;
+    db.doc("state/progress").set({days:S.days.slice(),book:S.book,a1:S.a1,a2:S.a2})
+      .catch(function(){}).then(function(){busy=false;if(again){again=false;persist();}});
+  }
+
+  /* ---------- static ---------- */
+  function buildStatic(){
+    var dw=["ش","ی","د","س","چ","پ","ج"],h="";
+    for(var i=0;i<7;i++)h+='<div class="dow">'+dw[i]+'</div>';
+    $("dows").innerHTML=h;
+    var c="";
+    for(var j=0;j<WEEKS*7;j++)c+='<div class="cell" data-d="'+shift(START,j)+'" role="button" tabindex="0"></div>';
+    $("cal").innerHTML=c;
+    var s="";
+    INTL.forEach(function(x){s+='<div class="srow"><a href="'+x.u+'" target="_blank" rel="noopener">'+
+      '<span class="tag">'+x.g+'</span><span class="nm">'+x.n+'</span><span class="note">'+x.l+'</span></a></div>';});
+    $("srcs").innerHTML=s;
+    var l="";
+    for(var k=1;k<=25;k++)
+      l+='<div class="lrow"><span class="i tnum">'+fa(k)+'</span><span class="nm">'+slotName(k)+'</span></div>';
+    $("lessons").innerHTML=l;
+    try{$("am").value=localStorage.getItem(LS+".model")||"claude-sonnet-4-5";}catch(e){}
+  }
+
+  /* ---------- render ---------- */
+  function render(){
+    reindex();
+    var t=today(), d0=done[t], started=idx(t)>=0, mot=isMot(t), no=mot?lessonNo(t):0;
+
+    $("dchip").textContent=new Date().toLocaleDateString("fa-IR",{weekday:"long",day:"numeric",month:"long"});
+
+    // ring = progress through the 70 days
+    var span=diff(START,GATE), gone=Math.max(0,Math.min(span,diff(START,t)));
+    var pct=gone/span;
+    $("ring").style.strokeDasharray=RING;
+    $("ring").style.strokeDashoffset=RING*(1-pct);
+
+    var st=streak();
+    $("streak").textContent=fa(st);
+    $("streakLab").textContent=st===0?"هنوز شروع نشده":"روز پیاپی";
+    $("ringSub").textContent=fa(Math.round(pct*100))+"٪ مسیر طی شده";
+
+    $("total").textContent=fa(S.days.length);
+    var mdone=0;for(var i=0;i<MOT.length;i++)if(MOT[i]&&done[shift(START,i)])mdone++;
+    $("motN").textContent=fa(mdone);
+    $("left").textContent=fa(Math.max(0,diff(t,GATE)));
+
+    $("card").classList.toggle("done",!!d0);
+    if(!started){
+      $("kicker").textContent="START";$("title").textContent="هنوز شروع نشده";
+      $("lead").textContent="مسیر از شنبه ۲۸ شهریور باز می‌شود.";
+    } else if(mot){
+      $("kicker").textContent="MOTAMEM";
+      $("title").textContent=d0?"کامنت امروز نوشته شد":"درس "+fa(no)+" از ۲۵";
+      $("lead").textContent="درس را بخوان و زیرش کامنت بگذار. تیک امروز مشروط به کامنت است، نه خواندن.";
+    } else {
+      $("kicker").textContent="INTERNATIONAL";
+      $("title").textContent=d0?"امروز انجام شد":"کار امروز";
+      $("lead").textContent="بخوان و سه چهار خط واکنش بنویس. حداقل بیست دقیقه، سقف یک ساعت.";
+    }
+    $("tick").textContent=d0?"لغو تیک امروز":(mot&&started?"کامنت گذاشتم":"امروز انجام شد");
+
+    paintItem(mot&&started,no,t);
+
+    // calendar
+    var cells=$("cal").children;
+    for(var c=0;c<cells.length;c++){
+      var el=cells[c],dd=el.getAttribute("data-d"),cmp=diff(dd,t);
+      el.className="cell"+(MOT[c]?" mot":"")+(MARKS[dd]?" mark":"");
+      if(done[dd])el.classList.add("done");
+      else if(cmp>0)el.classList.add("gone");
+      if(cmp<0)el.classList.add("future");
+      if(cmp===0)el.classList.add("now");
+      el.title=faD(dd)+" — "+(MOT[c]?"متمم":"بین‌المللی");
+    }
+
+    [["book","st-book"],["a1","st-a1"],["a2","st-a2"]].forEach(function(p){
+      var e=$(p[1]);e.textContent=S[p[0]]?"انجام شد":"در انتظار";e.classList.toggle("ok",S[p[0]]);
+    });
+
+    // lessons
+    $("lprog").textContent=fa(mdone)+" از ۲۵";
+    var rows=$("lessons").children;
+    for(var q=0;q<rows.length;q++){
+      rows[q].className="lrow"+(q<mdone?" done":"")+((mot&&q===no-1)?" now":"");
+    }
+
+    renderMissed();
+  }
+
+  function paintItem(mot,no,t){
+    function sh(id,on,txt){var e=$(id);e.hidden=!on;if(on&&txt!=null)e.textContent=txt;}
+    if(mot){
+      $("pt").textContent=slotName(Math.min(no,25));$("pt").href=slotURL(Math.min(no,25));
+      $("ps").textContent="متمم — تفکر نقادانه";
+      sh("lw",0);sh("pw",0);sh("lq",0);sh("pq",0);sh("pn",0);return;
+    }
+    var p=picks[t];
+    if(p&&p.title&&p.url){
+      $("pt").textContent=p.title;$("pt").href=p.url;$("ps").textContent=p.source||"";
+      sh("lw",!!p.why);sh("pw",!!p.why,p.why||"");
+      sh("lq",!!p.question);sh("pq",!!p.question,p.question||"");
+      sh("pn",0);return;
+    }
+    var f=fallback(t);
+    $("pt").textContent=f.n;$("pt").href=f.u;$("ps").textContent=f.g+" — "+f.l;
+    sh("lw",0);sh("pw",0);sh("lq",0);sh("pq",0);
+    sh("pn",1,"انتخاب امروز هنوز نرسیده — فعلاً از این منبع شروع کن.");
+  }
+
+  function renderMissed(){
+    var m=missed(), box=$("missBox"), b=$("bdg");
+    b.hidden=!m.length;
+    if(!m.length){box.hidden=true;return;}
+    box.hidden=false;
+    var show=m.slice(-7),h="";
+    show.forEach(function(d){
+      var body,act;
+      if(isMot(d)){
+        body="درس "+fa(lessonNo(d))+" — "+slotName(lessonNo(d));
+        act='<a class="mini" href="'+slotURL(lessonNo(d))+'" target="_blank" rel="noopener" style="text-decoration:none">باز کن</a>';
+      }else{
+        var p=picks[d];
+        if(p&&p.title&&p.url){body=p.title;act='<a class="mini" href="'+p.url+'" target="_blank" rel="noopener" style="text-decoration:none">باز کن</a>';}
+        else{body="منبع بین‌المللی";act='<button class="mini" data-find="'+d+'" type="button">پیدا کن</button>';}
+      }
+      h+='<div class="mrow"><span class="mt">'+body+'<small>'+faD(d)+'</small></span>'+act+
+         '<button class="mini go" data-tick="'+d+'" type="button">زدم</button></div>';
+    });
+    $("missRows").innerHTML=h;
+  }
+
+  function toggle(d){
+    var i=S.days.indexOf(d);
+    if(i===-1)S.days.push(d);else S.days.splice(i,1);
+    persist();render();
+  }
+
+  /* ---------- notes ---------- */
+  var nt=null;
+  $("note").addEventListener("input",function(){
+    var v=$("note").value; $("noteState").textContent="…";
+    clearTimeout(nt);
+    nt=setTimeout(function(){
+      try{localStorage.setItem(LS+".note."+today(),v);}catch(e){}
+      if(db) db.doc("notes/"+today()).set({date:today(),text:v,updated:new Date().toISOString()})
+        .then(function(){$("noteState").textContent="ذخیره شد";},
+              function(){$("noteState").textContent="فقط روی این دستگاه";});
+      else $("noteState").textContent="فقط روی این دستگاه";
+    },700);
+  });
+
+  /* ---------- events ---------- */
+  $("tick").addEventListener("click",function(){toggle(today());});
+  /* ---------- day sheet ---------- */
+  var shDay=null;
+  function openSheet(d){
+    shDay=d;
+    var mot=isMot(d), fut=diff(d,today())<0;
+    $("shTitle").textContent=faD(d);
+    $("shSub").textContent=(mot?"روز متمم":"روز منبع بین‌المللی")+
+      (fut?" — هنوز نرسیده":(done[d]?" — انجام شده":" — انجام نشده"));
+    if(mot){
+      var n=lessonNo(d);
+      $("shLink").textContent="درس "+fa(n)+" از ۲۵ — "+slotName(n);
+      $("shLink").href=slotURL(n);$("shSrc").textContent="متمم — تفکر نقادانه";
+      $("shFind").hidden=true;
+    } else {
+      var p=picks[d];
+      if(p&&p.title&&p.url){
+        $("shLink").textContent=p.title;$("shLink").href=p.url;
+        $("shSrc").textContent=p.source||"";$("shFind").hidden=true;
+      } else {
+        var f=fallback(d);
+        $("shLink").textContent=f.n;$("shLink").href=f.u;
+        $("shSrc").textContent="مقاله آن روز ثبت نشده — "+f.g;
+        $("shFind").hidden=fut;
+      }
+    }
+    var nt2="";
+    try{nt2=localStorage.getItem(LS+".note."+d)||"";}catch(e){}
+    $("shNote").hidden=!nt2; if(nt2)$("shNote").textContent=nt2;
+    $("shTick").textContent=done[d]?"تیک را بردار":"تیک بزن";
+    $("shTick").hidden=fut;
+    $("scrim").classList.add("on");
+  }
+  function closeSheet(){$("scrim").classList.remove("on");shDay=null;}
+  $("shClose").addEventListener("click",closeSheet);
+  $("scrim").addEventListener("click",function(e){if(e.target===$("scrim"))closeSheet();});
+  $("shTick").addEventListener("click",function(){if(shDay){toggle(shDay);openSheet(shDay);}});
+  $("shFind").addEventListener("click",function(){if(shDay)pick(true,shDay);});
+  document.addEventListener("keydown",function(e){if(e.key==="Escape")closeSheet();});
+
+  $("cal").addEventListener("click",function(e){
+    var el=e.target.closest(".cell");if(!el)return;
+    openSheet(el.getAttribute("data-d"));
+  });
+  $("cal").addEventListener("keydown",function(e){
+    if(e.key!=="Enter"&&e.key!==" ")return;
+    var el=e.target.closest(".cell");if(!el)return;
+    e.preventDefault();openSheet(el.getAttribute("data-d"));
+  });
+
+  /* ---------- export ---------- */
+  function report(){
+    reindex();
+    var t=today(), L=[];
+    L.push("گزارش مسیر یادگیری — محمدرضا اشرفی");
+    L.push("تاریخ گزارش: "+faD(t));
+    L.push("شروع: "+faD(START)+"   دروازه: "+faD(GATE));
+    L.push("");
+    L.push("روز پیاپی: "+streak());
+    L.push("مجموع روزهای انجام‌شده: "+S.days.length);
+    var md=0;for(var i=0;i<MOT.length;i++)if(MOT[i]&&done[shift(START,i)])md++;
+    L.push("درس متمم انجام‌شده: "+md+" از ۲۵");
+    L.push("کتاب How Brands Grow: "+(S.book?"تمام":"در انتظار"));
+    L.push("مقاله اول: "+(S.a1?"منتشر شد":"در انتظار"));
+    L.push("مقاله دوم: "+(S.a2?"منتشر شد":"در انتظار"));
+    L.push("");
+    L.push("— — — روزها — — —");
+    for(var k=0;k<MOT.length;k++){
+      var d=shift(START,k);
+      if(diff(d,t)<0) break;
+      var what;
+      if(MOT[k]) what="متمم، درس "+lessonNo(d)+" — "+slotName(lessonNo(d));
+      else{var p=picks[d];what=p&&p.title?("مقاله: "+p.title+" ("+(p.source||"")+") "+p.url):"منبع بین‌المللی — ثبت نشده";}
+      var nt3="";try{nt3=localStorage.getItem(LS+".note."+d)||"";}catch(e){}
+      L.push("");
+      L.push((done[d]?"[x] ":"[ ] ")+faD(d));
+      L.push("    "+what);
+      if(nt3) L.push("    واکنش: "+nt3.replace(/\n/g," / "));
+    }
+    return L.join("\n");
+  }
+  $("exCopy").addEventListener("click",function(){
+    var txt=report();
+    function ok(){$("exMsg").textContent="کپی شد — هر جا خواستی پیست کن.";}
+    try{navigator.clipboard.writeText(txt).then(ok,fb);}catch(e){fb();}
+    function fb(){
+      var ta=document.createElement("textarea");ta.value=txt;
+      ta.style.position="fixed";ta.style.opacity="0";document.body.appendChild(ta);ta.select();
+      try{document.execCommand("copy");ok();}catch(e2){$("exMsg").textContent="کپی نشد.";}
+      document.body.removeChild(ta);
+    }
+  });
+  $("exFile").addEventListener("click",function(){
+    try{
+      var blob=new Blob([report()],{type:"text/plain;charset=utf-8"});
+      var a=document.createElement("a");
+      a.href=URL.createObjectURL(blob);
+      a.download="masir-"+today()+".txt";
+      document.body.appendChild(a);a.click();
+      setTimeout(function(){URL.revokeObjectURL(a.href);a.remove();},1500);
+      $("exMsg").textContent="اگر دانلود نشد، از دکمه کپی استفاده کن.";
+    }catch(e){$("exMsg").textContent="دانلود ممکن نشد — از کپی استفاده کن.";}
+  });
+  $("missRows").addEventListener("click",function(e){
+    var f=e.target.closest("[data-find]"); if(f){pick(true,f.getAttribute("data-find"));return;}
+    var k=e.target.closest("[data-tick]"); if(k){toggle(k.getAttribute("data-tick"));}
+  });
+  [["st-book","book"],["st-a1","a1"],["st-a2","a2"]].forEach(function(p){
+    $(p[0]).addEventListener("click",function(){S[p[1]]=!S[p[1]];persist();render();});
+    $(p[0]).style.cursor="pointer";
+  });
+  document.querySelectorAll(".tab").forEach(function(b){
+    b.addEventListener("click",function(){
+      document.querySelectorAll(".tab").forEach(function(x){x.classList.remove("on");});
+      document.querySelectorAll(".view").forEach(function(x){x.classList.remove("on");});
+      b.classList.add("on");
+      $("v-"+b.getAttribute("data-v")).classList.add("on");
+      window.scrollTo({top:0,behavior:"smooth"});
+    });
+  });
+
+  /* ---------- API pick ---------- */
+  function key(){try{return localStorage.getItem(LS+".apikey")||"";}catch(e){return "";}}
+  function model(){try{return localStorage.getItem(LS+".model")||"claude-sonnet-4-5";}catch(e){return "claude-sonnet-4-5";}}
+  function cacheGet(d){try{var r=localStorage.getItem(LS+".pick."+d);return r?JSON.parse(r):null;}catch(e){return null;}}
+  function cacheSet(d,p){try{localStorage.setItem(LS+".pick."+d,JSON.stringify(p));}catch(e){}}
+
+  function pick(manual,forDate){
+    var k=key(), d=forDate||today();
+    if(!k){if(manual)$("akMsg").textContent="اول کلید را در تب بیشتر ذخیره کن.";return;}
+    if(isMot(d)||idx(d)<0){if(manual)$("akMsg").textContent="آن روز، روز متمم است.";return;}
+    if(!manual&&picks[d])return;
+    $("akMsg").textContent="در حال جستجو…";
+    var prompt="امروز "+d+" است. برای محمدرضا اشرفی، مدیرعامل آژانس لامانا در دبی و تهران، با تمرکز FMCG و "+
+      "لایف‌استایل در خاورمیانه و هدف اعتبار بین‌المللی در خلیج، یک مطلب برای مطالعهٔ امروز انتخاب کن.\n\n"+
+      "با جستجوی وب بگرد و فقط از این منابع:\n"+
+      INTL.map(function(s){return "— "+s.n+" ("+s.u+")";}).join("\n")+
+      "\n\nپنجره ۷۲ ساعت اخیر. جمعه و شنبه مطلب تازه کم است؛ آن روزها Ehrenberg-Bass یا گزارش مرجع.\n"+
+      "فقط یک مطلب. عنوان و لینک واقعی از نتایج جستجو، نه ساخته‌شده.\n\n"+
+      "خروجی فقط یک آبجکت JSON با کلیدهای title, url, source, why, question. "+
+      "why و question فارسی و وصل به کار واقعی او.";
+    fetch("https://api.anthropic.com/v1/messages",{
+      method:"POST",
+      headers:{"content-type":"application/json","x-api-key":k,
+        "anthropic-version":"2023-06-01","anthropic-dangerous-direct-browser-access":"true"},
+      body:JSON.stringify({model:model(),max_tokens:1200,
+        tools:[{type:"web_search_20250305",name:"web_search",max_uses:6}],
+        messages:[{role:"user",content:prompt}]})
+    }).then(function(r){return r.json();}).then(function(j){
+      if(j&&j.error){$("akMsg").textContent="خطا: "+(j.error.message||"نامشخص");return;}
+      var txt="";(j&&j.content||[]).forEach(function(b){if(b.type==="text"&&b.text)txt+=b.text;});
+      var a=txt.indexOf("{"),z=txt.lastIndexOf("}"),p=null;
+      if(a>-1&&z>a){try{p=JSON.parse(txt.slice(a,z+1));}catch(e){}}
+      if(!p||!p.title||!p.url){$("akMsg").textContent="جواب قابل خواندن نبود.";return;}
+      cacheSet(d,p);picks[d]=p;render();
+      $("akMsg").textContent="انتخاب شد — "+faD(d);
+    }).catch(function(e){$("akMsg").textContent="تماس برقرار نشد: "+(e&&e.message||"خطای شبکه");});
+  }
+  $("akSave").addEventListener("click",function(){
+    try{
+      var v=$("ak").value.trim();
+      if(v)localStorage.setItem(LS+".apikey",v);
+      localStorage.setItem(LS+".model",$("am").value.trim()||"claude-sonnet-4-5");
+      $("ak").value="";$("akMsg").textContent="ذخیره شد.";
+    }catch(e){$("akMsg").textContent="ذخیره نشد.";}
+  });
+  $("akRun").addEventListener("click",function(){pick(true);});
+
+  /* ---------- boot ---------- */
+  lsLoad();
+  for(var i0=0;i0<MOT.length;i0++){var dd0=shift(START,i0);
+    if(diff(dd0,today())<0)break; var c0=cacheGet(dd0); if(c0)picks[dd0]=c0;}
+  buildStatic();
+  try{$("note").value=localStorage.getItem(LS+".note."+today())||"";}catch(e){}
+  render();
+  if(!picks[today()])setTimeout(function(){pick(false);},400);
+
+  if(window.claude&&window.claude.use){
+    window.claude.use("db").then(function(x){
+      if(!x){$("sync").textContent="همگام‌سازی در دسترس نیست — فقط روی همین دستگاه.";return;}
+      db=x;$("sync").textContent="همگام با همه دستگاه‌ها";
+      db.doc("state/progress").onSnapshot(function(s){
+        if(s.exists){var v=s.data()||{};
+          if(Array.isArray(v.days))S.days=v.days.slice();
+          S.book=!!v.book;S.a1=!!v.a1;S.a2=!!v.a2;lsSave();render();}
+        else if(S.days.length)persist();
+      },function(){$("sync").textContent="همگام‌سازی قطع شد.";});
+      db.doc("picks/"+today()).onSnapshot(function(s){
+        if(s.exists){picks[today()]=s.data();render();}
+      },function(){});
+      missed().slice(-7).forEach(function(d){
+        if(isMot(d)||picks[d])return;
+        db.doc("picks/"+d).get().then(function(s){if(s.exists){picks[d]=s.data();render();}},function(){});
+      });
+    },function(){$("sync").textContent="همگام‌سازی در دسترس نیست.";});
+  } else {
+    $("sync").textContent="فقط روی همین دستگاه ذخیره می‌شود.";
+  }
+})();
+</script>
+
+</body>
+</html>
